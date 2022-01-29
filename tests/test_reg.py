@@ -1,5 +1,5 @@
 import numpy as np
-from niftiregpy import reg
+from niftyregpy import reg
 import test_common as common
 
 def test_aladin_default():

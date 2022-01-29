@@ -1,5 +1,5 @@
 import numpy as np
-from niftiregpy import tools
+from niftyregpy import tools
 import test_common as common
 
 def test_float():
