@@ -1,16 +1,19 @@
 import random
 import numpy as np
 
-def random_float(low=0,high=1):
+def random_float(low=0.0, high=1.0):
     return random.uniform(a=low,b=high)
 
 def seed_random_generators(seed=42):
     np.random.seed(seed)
     random.seed(seed)
 
-def create_random_array(shape, dtype):
-    array = np.random.random_sample(shape)
-    return array.astype(dtype)
+def create_random_array(shape, dtype=np.float32):
+    random_array = np.random.random_sample(shape)
+    return random_array.astype(dtype)
+
+def create_random_tuple(N):
+    return ((random_float(), )*N)
 
 def create_circle(length, c=None, r=None, dtype=np.float32):
 
