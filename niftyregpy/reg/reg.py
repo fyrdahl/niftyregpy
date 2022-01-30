@@ -420,12 +420,15 @@ def tools(input, output=None, float=None, down=None, smoS=None, smoG=None, smoL=
         cmd_str += '-down '
     
     if smoS is not None:
+        smoS = ((smoS, ) * 3) if np.isscalar(smoS) else smoS
         cmd_str += f'-smoS {" ".join(str(x) for x in smoS)}'
     
     if smoG is not None:
+        smoG = ((smoG, ) * 3) if np.isscalar(smoG) else smoG
         cmd_str += f'-smoG {" ".join(str(x) for x in smoG)}'
 
     if smoL is not None:
+        smoL = ((smoL, ) * 3) if np.isscalar(smoL) else smoL
         cmd_str += f'-smoL {" ".join(str(x) for x in smoL)}'
 
     if add is not None:
