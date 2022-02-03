@@ -12,7 +12,7 @@ def aladin(ref, flo, noSym=None, regOnly=None, affDirect=None, aff=None,
            inaff=None, rmask=None, fmask=None, res=None, maxit=None, ln=None,
            lp=None, smooR=None, smooF=None, refLowThr=None, refUpThr=None,
            floLowThr=None, floUpThr=None, nac=None, cog=None, interp=None,
-           iso=None, pv=None, pi=None, speeeeed=None, omp=None, verbose=True):
+           iso=None, pv=None, pi=None, speeeeed=None, omp=None, verbose=False):
 
     """
     Block Matching algorithm for global registration.
@@ -124,7 +124,7 @@ def f3d(ref=None, flo=None, aff=None, incpp=None, cpp=None, res=None,
         jl=None, noAppJL=None, nmi=None, rbn=None, fbn=None, lncc=None,
         ssd=None, kld=None, amc=None, maxit=None, ln=None, lp=None, nopy=None,
         noConj=None, pert=None, vel=None, fmask=None, omp=None, mem=None,
-        gpu=None, smoothGrad=None, pad=None, verbose=True):
+        gpu=None, smoothGrad=None, pad=None, verbose=False):
 
     """
     Fast Free-Form Deformation algorithm for non-rigid registration. This
