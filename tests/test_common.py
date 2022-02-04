@@ -1,4 +1,5 @@
 import random
+
 import numpy as np
 
 
@@ -14,6 +15,18 @@ def seed_random_generators(seed=42):
 def create_random_array(shape, dtype=np.float32):
     random_array = np.random.random_sample(shape)
     return random_array.astype(dtype)
+
+
+def create_random_affine(dtype=np.float32):
+    phi = random_float(-np.pi, np.pi)
+    aff = np.eye(4)
+    aff[0, 0] = np.cos(phi)
+    aff[0, 1] = -np.sin(phi)
+    aff[1, 0] = np.sin(phi)
+    aff[1, 1] = np.cos(phi)
+    aff[0, 3] = 0.5 + random_float(-0.1, 0.1)
+    aff[1, 3] = 1.0 + random_float(-0.1, 0.1)
+    return aff.astype(dtype)
 
 
 def create_random_tuple(N):
