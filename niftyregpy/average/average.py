@@ -1,10 +1,7 @@
 import tempfile as tmp
+from os import path
 
 from ..utils import call_niftyreg, read_nifti, read_txt, write_nifti, write_txt
-
-DEBUG = False
-NAME = tmp.NamedTemporaryFile().name
-BASE_STR = "reg_average "
 
 
 def avg(input):
@@ -21,43 +18,49 @@ def avg(input):
         return _avg_nii(input)
 
 
-def _avg_txt(input):
+def _avg_txt(input, verbose=False):
 
-    cmd_str = BASE_STR
-    cmd_str += f"{NAME}output.txt  -avg "
+    with tmp.TemporaryDirectory() as tmp_folder:
 
-    for i, x in enumerate(input):
-        write_txt(f"{NAME}avg_{i}.txt", x)
-        cmd_str += f"{NAME}avg_{i}.txt "
+        tmp_folder += path.sep
+        cmd_str = "reg_average "
+        cmd_str += f"{tmp_folder}output.txt  -avg "
 
-    if DEBUG:
-        print(cmd_str)
+        for i, x in enumerate(input):
+            write_txt(f"{tmp_folder}avg_{i}.txt", x)
+            cmd_str += f"{tmp_folder}avg_{i}.txt "
 
-    if call_niftyreg(cmd_str):
-        return read_txt(f"{NAME}output.txt")
-    else:
-        return None
+        if verbose:
+            print(cmd_str)
 
-
-def _avg_nii(input):
-
-    cmd_str = BASE_STR
-    cmd_str += f"{NAME}output.nii  -avg "
-
-    for i, x in enumerate(input):
-        write_nifti(f"{NAME}avg_{i}.nii", x)
-        cmd_str += f"{NAME}avg_{i}.nii "
-
-    if DEBUG:
-        print(cmd_str)
-
-    if call_niftyreg(cmd_str):
-        return read_nifti(f"{NAME}output.nii")
-    else:
-        return None
+        if call_niftyreg(cmd_str, verbose):
+            return read_txt(f"{tmp_folder}output.txt")
+        else:
+            return None
 
 
-def avg_lts(input):
+def _avg_nii(input, verbose=False):
+
+    with tmp.TemporaryDirectory() as tmp_folder:
+
+        tmp_folder += path.sep
+        cmd_str = "reg_average "
+        cmd_str += f"{tmp_folder}output.nii  -avg "
+
+        for i, x in enumerate(input):
+            write_nifti(f"{tmp_folder}avg_{i}.nii", x)
+            cmd_str += f"{tmp_folder}avg_{i}.nii "
+
+        if verbose:
+            print(cmd_str)
+
+        if call_niftyreg(cmd_str, verbose):
+            return read_nifti(f"{tmp_folder}output.nii")
+        else:
+            return None
+
+
+def avg_lts(input, verbose=False):
 
     """
     It will estimate the robust average affine matrix by considering outliers.
@@ -65,20 +68,23 @@ def avg_lts(input):
 
     assert all([a.shape == (4, 4) for a in input]), "Not affine matrices"
 
-    cmd_str = BASE_STR
-    cmd_str += f"{NAME}output.txt  -avg "
+    with tmp.TemporaryDirectory() as tmp_folder:
 
-    for i, x in enumerate(input):
-        write_txt(f"{NAME}avg_{i}.txt", x)
-        cmd_str += f"{NAME}avg_{i}.txt "
+        tmp_folder += path.sep
+        cmd_str = "reg_average "
+        cmd_str += f"{tmp_folder}output.txt  -avg "
 
-    if DEBUG:
-        print(cmd_str)
+        for i, x in enumerate(input):
+            write_txt(f"{tmp_folder}avg_{i}.txt", x)
+            cmd_str += f"{tmp_folder}avg_{i}.txt "
 
-    if call_niftyreg(cmd_str):
-        return read_txt(f"{NAME}output.txt")
-    else:
-        return None
+        if verbose:
+            print(cmd_str)
+
+        if call_niftyreg(cmd_str, verbose):
+            return read_txt(f"{tmp_folder}output.txt")
+        else:
+            return None
 
 
 def avg_tran():

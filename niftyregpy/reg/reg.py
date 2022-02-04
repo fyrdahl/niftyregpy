@@ -1,18 +1,43 @@
-import numpy as np
 import shlex as sh
-import tempfile as tmp
 import subprocess as sp
-from ..utils import read_txt, write_txt, read_nifti, write_nifti, call_niftyreg
+import tempfile as tmp
+from os import path
 
-DEBUG = False
-NAME = tmp.NamedTemporaryFile().name
+import numpy as np
+
+from ..utils import call_niftyreg, read_nifti, read_txt, write_nifti, write_txt
 
 
-def aladin(ref, flo, noSym=None, regOnly=None, affDirect=None, aff=None,
-           inaff=None, rmask=None, fmask=None, res=None, maxit=None, ln=None,
-           lp=None, smooR=None, smooF=None, refLowThr=None, refUpThr=None,
-           floLowThr=None, floUpThr=None, nac=None, cog=None, interp=None,
-           iso=None, pv=None, pi=None, speeeeed=None, omp=None, verbose=False):
+def aladin(
+    ref,
+    flo,
+    noSym=None,
+    regOnly=None,
+    affDirect=None,
+    aff=None,
+    inaff=None,
+    rmask=None,
+    fmask=None,
+    res=None,
+    maxit=None,
+    ln=None,
+    lp=None,
+    smooR=None,
+    smooF=None,
+    refLowThr=None,
+    refUpThr=None,
+    floLowThr=None,
+    floUpThr=None,
+    nac=None,
+    cog=None,
+    interp=None,
+    iso=None,
+    pv=None,
+    pi=None,
+    speeeeed=None,
+    omp=None,
+    verbose=False,
+):
 
     """
     Block Matching algorithm for global registration.
@@ -21,110 +46,150 @@ def aladin(ref, flo, noSym=None, regOnly=None, affDirect=None, aff=None,
     """
     usage_string = "reg_aladin -ref <filename> -flo <filename> [OPTIONS]"
 
-    cmd_str = 'reg_aladin '
+    with tmp.TemporaryDirectory() as tmp_folder:
 
-    write_nifti(f'{NAME}ref', ref)
-    write_nifti(f'{NAME}flo', flo)
+        tmp_folder += path.sep
+        cmd_str = "reg_aladin "
 
-    cmd_str += f'-ref {NAME}ref.nii -flo {NAME}flo.nii '
+        write_nifti(f"{tmp_folder}ref", ref)
+        write_nifti(f"{tmp_folder}flo", flo)
 
-    opts_str = ''
+        cmd_str += f"-ref {tmp_folder}ref.nii -flo {tmp_folder}flo.nii "
 
-    if res is None:
-        res = NAME + 'res.nii'
-    if aff is None:
-        aff = NAME + 'aff.txt'
+        opts_str = ""
 
-    opts_str += f'-res {res} '
-    opts_str += f'-aff {aff} '
+        if res is None:
+            res = tmp_folder + "res.nii"
+        if aff is None:
+            aff = tmp_folder + "aff.txt"
 
-    if noSym is True:
-        opts_str += '-noSym '
+        opts_str += f"-res {res} "
+        opts_str += f"-aff {aff} "
 
-    if regOnly is True:
-        opts_str += '-regOnly '
+        if noSym is True:
+            opts_str += "-noSym "
 
-    if affDirect is True:
-        opts_str += '-affDirect '
+        if regOnly is True:
+            opts_str += "-regOnly "
 
-    if inaff is not None:
-        opts_str += f'-inaff {inaff} '
+        if affDirect is True:
+            opts_str += "-affDirect "
 
-    if rmask is not None:
-        opts_str += f'-rmask {rmask} '
+        if inaff is not None:
+            opts_str += f"-inaff {inaff} "
 
-    if fmask is not None:
-        opts_str += f'-fmask {fmask} '
+        if rmask is not None:
+            opts_str += f"-rmask {rmask} "
 
-    if maxit is not None:
-        opts_str += f'-maxit {maxit} '
+        if fmask is not None:
+            opts_str += f"-fmask {fmask} "
 
-    if ln is not None:
-        opts_str += f'-ln {ln} '
+        if maxit is not None:
+            opts_str += f"-maxit {maxit} "
 
-    if lp is not None:
-        opts_str += f'-lp {lp} '
+        if ln is not None:
+            opts_str += f"-ln {ln} "
 
-    if smooR is not None:
-        opts_str += f'-smooR {smooR} '
+        if lp is not None:
+            opts_str += f"-lp {lp} "
 
-    if smooF is not None:
-        opts_str += f'-smooF {smooF} '
+        if smooR is not None:
+            opts_str += f"-smooR {smooR} "
 
-    if refLowThr is not None:
-        opts_str += f'-refLowThr {refLowThr} '
+        if smooF is not None:
+            opts_str += f"-smooF {smooF} "
 
-    if refUpThr is not None:
-        opts_str += f'-refUpThr {refUpThr} '
+        if refLowThr is not None:
+            opts_str += f"-refLowThr {refLowThr} "
 
-    if floLowThr is not None:
-        opts_str += f'-floLowThr {floLowThr} '
+        if refUpThr is not None:
+            opts_str += f"-refUpThr {refUpThr} "
 
-    if floUpThr is not None:
-        opts_str += f'-floUpThr {floUpThr} '
+        if floLowThr is not None:
+            opts_str += f"-floLowThr {floLowThr} "
 
-    if nac is True:
-        opts_str += '-nac '
+        if floUpThr is not None:
+            opts_str += f"-floUpThr {floUpThr} "
 
-    if cog is True:
-        opts_str += '-cog '
+        if nac is True:
+            opts_str += "-nac "
 
-    if interp is True:
-        opts_str += '-interp '
+        if cog is True:
+            opts_str += "-cog "
 
-    if iso is True:
-        opts_str += '-iso '
+        if interp is True:
+            opts_str += "-interp "
 
-    if pv is not None:
-        opts_str += f'-pv {pv} '
+        if iso is True:
+            opts_str += "-iso "
 
-    if pi is not None:
-        opts_str += f'-pi {pi} '
+        if pv is not None:
+            opts_str += f"-pv {pv} "
 
-    if speeeeed is True:
-        opts_str += '-speeeeed '
+        if pi is not None:
+            opts_str += f"-pi {pi} "
 
-    if omp is not None:
-        opts_str += f'-omp {omp} '
+        if speeeeed is True:
+            opts_str += "-speeeeed "
 
-    cmd_str += opts_str + '  '
+        if omp is not None:
+            opts_str += f"-omp {omp} "
 
-    if DEBUG:
-        print(cmd_str)
+        cmd_str += opts_str + "  "
 
-    if call_niftyreg(cmd_str, verbose):
-        return dict(aff=read_txt(aff), res=read_nifti(res))
-    else:
-        return None
+        if verbose:
+            print(cmd_str)
+
+        if call_niftyreg(cmd_str, verbose):
+            return dict(aff=read_txt(aff), res=read_nifti(res))
+        else:
+            return None
 
 
-def f3d(ref=None, flo=None, aff=None, incpp=None, cpp=None, res=None,
-        rmask=None, smooR=None, smooF=None, rLwTh=None, rUpTh=None, fLwTh=None,
-        fUpTh=None, sx=None, sy=None, sz=None, be=None, le=None, l2=None,
-        jl=None, noAppJL=None, nmi=None, rbn=None, fbn=None, lncc=None,
-        ssd=None, kld=None, amc=None, maxit=None, ln=None, lp=None, nopy=None,
-        noConj=None, pert=None, vel=None, fmask=None, omp=None, mem=None,
-        gpu=None, smoothGrad=None, pad=None, verbose=False):
+def f3d(
+    ref=None,
+    flo=None,
+    aff=None,
+    incpp=None,
+    cpp=None,
+    res=None,
+    rmask=None,
+    smooR=None,
+    smooF=None,
+    rLwTh=None,
+    rUpTh=None,
+    fLwTh=None,
+    fUpTh=None,
+    sx=None,
+    sy=None,
+    sz=None,
+    be=None,
+    le=None,
+    l2=None,
+    jl=None,
+    noAppJL=None,
+    nmi=None,
+    rbn=None,
+    fbn=None,
+    lncc=None,
+    ssd=None,
+    kld=None,
+    amc=None,
+    maxit=None,
+    ln=None,
+    lp=None,
+    nopy=None,
+    noConj=None,
+    pert=None,
+    vel=None,
+    fmask=None,
+    omp=None,
+    mem=None,
+    gpu=None,
+    smoothGrad=None,
+    pad=None,
+    verbose=False,
+):
 
     """
     Fast Free-Form Deformation algorithm for non-rigid registration. This
@@ -140,181 +205,194 @@ def f3d(ref=None, flo=None, aff=None, incpp=None, cpp=None, res=None,
 
     usage_string = "reg_f3d -ref <filename> -flo <filename> [OPTIONS]"
 
-    cmd_str = 'reg_f3d '
+    with tmp.TemporaryDirectory() as tmp_folder:
 
-    write_nifti(f'{NAME}ref', ref)
-    write_nifti(f'{NAME}flo', flo)
+        tmp_folder += path.sep
+        cmd_str = "reg_f3d "
 
-    cmd_str += f'-ref {NAME}ref.nii -flo {NAME}flo.nii '
+        write_nifti(f"{tmp_folder}ref", ref)
+        write_nifti(f"{tmp_folder}flo", flo)
 
-    opts_str = ''
+        cmd_str += f"-ref {tmp_folder}ref.nii -flo {tmp_folder}flo.nii "
 
-    if res is None:
-        res = NAME + 'res.nii'
-    if cpp is None:
-        cpp = NAME + 'cpp.nii'
+        opts_str = ""
 
-    opts_str += f'-res {res} '
-    opts_str += f'-cpp {cpp} '
+        if res is None:
+            res = tmp_folder + "res.nii"
+        if cpp is None:
+            cpp = tmp_folder + "cpp.nii"
 
-    if aff is not None:
-        write_txt(f'{NAME}aff.txt', aff)
-        opts_str += f'-aff {NAME}aff.txt '
+        opts_str += f"-res {res} "
+        opts_str += f"-cpp {cpp} "
 
-    if incpp is not None:
-        opts_str += f'-incpp {incpp} '
+        if aff is not None:
+            write_txt(f"{tmp_folder}aff.txt", aff)
+            opts_str += f"-aff {tmp_folder}aff.txt "
 
-    if rmask is not None:
-        write_nifti(f'{NAME}rmask.nii', rmask)
-        opts_str += f'-rmask {NAME}rmask.nii '
+        if incpp is not None:
+            opts_str += f"-incpp {incpp} "
 
-    if smooR is not None:
-        opts_str += f'-smooR {smooR} '
+        if rmask is not None:
+            write_nifti(f"{tmp_folder}rmask.nii", rmask)
+            opts_str += f"-rmask {tmp_folder}rmask.nii "
 
-    if smooF is not None:
-        opts_str += f'-smooF {smooF} '
+        if smooR is not None:
+            opts_str += f"-smooR {smooR} "
 
-    if rLwTh is not None:
-        if type(rLwTh) is tuple:
-            opts_str += f'-rLwTh {" ".join(str(x) for x in rLwTh)} '
+        if smooF is not None:
+            opts_str += f"-smooF {smooF} "
+
+        if rLwTh is not None:
+            if type(rLwTh) is tuple:
+                opts_str += f'-rLwTh {" ".join(str(x) for x in rLwTh)} '
+            else:
+                opts_str += f"--rLwTh {rLwTh} "
+
+        if rUpTh is not None:
+            if type(rUpTh) is tuple:
+                opts_str += f'-rUpTh {" ".join(str(x) for x in rUpTh)} '
+            else:
+                opts_str += f"--rUpTh {rUpTh} "
+
+        if fLwTh is not None:
+            if type(fLwTh) is tuple:
+                opts_str += f'-fLwTh {" ".join(str(x) for x in fLwTh)} '
+            else:
+                opts_str += f"--fLwTh {fLwTh} "
+
+        if fUpTh is not None:
+            if type(fUpTh) is tuple:
+                opts_str += f'-fUpTh {" ".join(str(x) for x in fUpTh)} '
+            else:
+                opts_str += f"--fUpTh {fUpTh} "
+
+        if sx is not None:
+            opts_str += f"-sx {sx} "
+
+        if sy is not None:
+            opts_str += f"-sy {sy} "
+
+        if sz is not None:
+            opts_str += f"-sz {sz} "
+
+        if be is not None:
+            opts_str += f"-be {be} "
+
+        if le is not None:
+            opts_str += f'-le {" ".join(str(x) for x in le)} '
+
+        if l2 is not None:
+            opts_str += f"-l2 {l2} "
+
+        if jl is not None:
+            opts_str += f"-jl {jl} "
+
+        if noAppJL is True:
+            opts_str += "-noAppJL "
+
+        if nmi is True:
+            opts_str += "--nmi "
+
+        if rbn is not None:
+            if type(rbn) is tuple:
+                opts_str += f'-rbn {" ".join(str(x) for x in rbn)} '
+            else:
+                opts_str += f"--rbn {rbn} "
+
+        if fbn is not None:
+            if type(fbn) is tuple:
+                opts_str += f'-fbn {" ".join(str(x) for x in fbn)} '
+            else:
+                opts_str += f"--fbn {fbn} "
+
+        if lncc is not None:
+            if type(lncc) is tuple:
+                opts_str += f'-lncc {" ".join(str(x) for x in lncc)} '
+            else:
+                opts_str += f"--lncc {lncc} "
+
+        if ssd is not None:
+            if type(ssd) is (int, float):
+                opts_str += f"-ssd {int(ssd)} "
+            else:
+                opts_str += "--ssd "
+
+        if kld is not None:
+            if type(kld) is (int, float):
+                opts_str += f"-kld {int(kld)} "
+            else:
+                opts_str += "--kld "
+
+        if amc is True:
+            opts_str += "-amc "
+
+        if maxit is not None:
+            opts_str += f"-maxit {int(maxit)} "
+
+        if ln is not None:
+            opts_str += f"-ln {int(ln)} "
+
+        if lp is not None:
+            opts_str += f"-lp {int(lp)} "
+
+        if nopy is True:
+            opts_str += "-nopy "
+
+        if noConj is True:
+            opts_str += "-noConj "
+
+        if pert is not None:
+            opts_str += f"-pert {int(pert)} "
+
+        if vel is True:
+            opts_str += "-vel "
+
+        if fmask is not None:
+            write_nifti(f"{NAME}fmask.nii", rmask)
+            opts_str += f"-fmask {NAME}fmask.nii "
+
+        if omp is not None:
+            opts_str += f"-lp {int(omp)} "
+
+        if mem is True:
+            opts_str += "-mem "
+
+        if gpu is True:
+            opts_str += "-gpu "
+
+        if smoothGrad is not None:
+            opts_str += f"-smoothGrad {smoothGrad} "
+
+        if pad is not None:
+            opts_str += f"-pad {pad} "
+
+        cmd_str += opts_str
+
+        if verbose:
+            print(cmd_str)
+
+        if call_niftyreg(cmd_str, verbose):
+            return dict(res=read_nifti(res), cpp=read_nifti(cpp))
         else:
-            opts_str += f'--rLwTh {rLwTh} '
-
-    if rUpTh is not None:
-        if type(rUpTh) is tuple:
-            opts_str += f'-rUpTh {" ".join(str(x) for x in rUpTh)} '
-        else:
-            opts_str += f'--rUpTh {rUpTh} '
-
-    if fLwTh is not None:
-        if type(fLwTh) is tuple:
-            opts_str += f'-fLwTh {" ".join(str(x) for x in fLwTh)} '
-        else:
-            opts_str += f'--fLwTh {fLwTh} '
-
-    if fUpTh is not None:
-        if type(fUpTh) is tuple:
-            opts_str += f'-fUpTh {" ".join(str(x) for x in fUpTh)} '
-        else:
-            opts_str += f'--fUpTh {fUpTh} '
-
-    if sx is not None:
-        opts_str += f'-sx {sx} '
-
-    if sy is not None:
-        opts_str += f'-sy {sy} '
-
-    if sz is not None:
-        opts_str += f'-sz {sz} '
-
-    if be is not None:
-        opts_str += f'-be {be} '
-
-    if le is not None:
-        opts_str += f'-le {" ".join(str(x) for x in le)} '
-
-    if l2 is not None:
-        opts_str += f'-l2 {l2} '
-
-    if jl is not None:
-        opts_str += f'-jl {jl} '
-
-    if noAppJL is True:
-        opts_str += '-noAppJL '
-
-    if nmi is True:
-        opts_str += '--nmi '
-
-    if rbn is not None:
-        if type(rbn) is tuple:
-            opts_str += f'-rbn {" ".join(str(x) for x in rbn)} '
-        else:
-            opts_str += f'--rbn {rbn} '
-
-    if fbn is not None:
-        if type(fbn) is tuple:
-            opts_str += f'-fbn {" ".join(str(x) for x in fbn)} '
-        else:
-            opts_str += f'--fbn {fbn} '
-
-    if lncc is not None:
-        if type(lncc) is tuple:
-            opts_str += f'-lncc {" ".join(str(x) for x in lncc)} '
-        else:
-            opts_str += f'--lncc {lncc} '
-
-    if ssd is not None:
-        if type(ssd) is (int, float):
-            opts_str += f'-ssd {int(ssd)} '
-        else:
-            opts_str += '--ssd '
-
-    if kld is not None:
-        if type(kld) is (int, float):
-            opts_str += f'-kld {int(kld)} '
-        else:
-            opts_str += '--kld '
-
-    if amc is True:
-        opts_str += '-amc '
-
-    if maxit is not None:
-        opts_str += f'-maxit {int(maxit)} '
-
-    if ln is not None:
-        opts_str += f'-ln {int(ln)} '
-
-    if lp is not None:
-        opts_str += f'-lp {int(lp)} '
-
-    if nopy is True:
-        opts_str += '-nopy '
-
-    if noConj is True:
-        opts_str += '-noConj '
-
-    if pert is not None:
-        opts_str += f'-pert {int(pert)} '
-
-    if vel is True:
-        opts_str += '-vel '
-
-    if fmask is not None:
-        write_nifti(f'{NAME}fmask.nii', rmask)
-        opts_str += f'-fmask {NAME}fmask.nii '
-
-    if omp is not None:
-        opts_str += f'-lp {int(omp)} '
-
-    if mem is True:
-        opts_str += '-mem '
-
-    if gpu is True:
-        opts_str += '-gpu '
-
-    if smoothGrad is not None:
-        opts_str += f'-smoothGrad {smoothGrad} '
-
-    if pad is not None:
-        opts_str += f'-pad {pad} '
-
-    cmd_str += opts_str
-
-    if DEBUG:
-        print(cmd_str)
-
-    if call_niftyreg(cmd_str, verbose):
-        return dict(res=read_nifti(res), cpp=read_nifti(cpp))
-    else:
-        return None
+            return None
 
 
 def resample():
     raise NotImplementedError
 
 
-def transform(ref, flo, trans, res=None, blank=None, inter=None, pad=None,
-              tensor=None, psf=False, verbose=False):
+def transform(
+    ref,
+    flo,
+    trans,
+    res=None,
+    blank=None,
+    inter=None,
+    pad=None,
+    tensor=None,
+    psf=False,
+    verbose=False,
+):
     """
     Usage:	reg_resample -ref <filename> -flo <filename> [OPTIONS].
     -ref <filename>
@@ -325,196 +403,226 @@ def transform(ref, flo, trans, res=None, blank=None, inter=None, pad=None,
 
     usage_string = "reg_resample -ref <filename> -flo <filename> [OPTIONS]"
 
-    cmd_str = 'reg_resample '
+    cmd_str = "reg_resample "
 
-    write_nifti(f'{NAME}ref', ref)
-    write_nifti(f'{NAME}flo', flo)
-    write_nifti(f'{NAME}trans', trans)
+    with tmp.TemporaryDirectory() as tmp_folder:
+        tmp_folder += path.sep
+        write_nifti(f"{tmp_folder}ref", ref)
+        write_nifti(f"{tmp_folder}flo", flo)
+        write_nifti(f"{tmp_folder}trans", trans)
 
-    cmd_str += f'-ref {NAME}ref.nii -flo {NAME}flo.nii -trans {NAME}trans.nii '
+        cmd_str += f"-ref {tmp_folder}ref.nii -flo {tmp_folder}flo.nii -trans {tmp_folder}trans.nii "
 
-    opts_str = ''
+        opts_str = ""
 
-    if res is None:
-        res = NAME + 'res.nii'
+        if res is None:
+            res = NAME + "res.nii"
 
-    if blank is not None:
-        write_nifti(f'{NAME}blank.nii', blank)
-        opts_str += f'-blank {NAME}blank.nii '
+        if blank is not None:
+            write_nifti(f"{NAME}blank.nii", blank)
+            opts_str += f"-blank {NAME}blank.nii "
 
-    if inter is not None:
-        opts_str += f'-inter {int(inter)} '
+        if inter is not None:
+            opts_str += f"-inter {int(inter)} "
 
-    if pad is not None:
-        opts_str += f'-pad {int(pad)} '
+        if pad is not None:
+            opts_str += f"-pad {int(pad)} "
 
-    if tensor is not None:
-        opts_str += f'-fbn {" ".join(str(x) for x in tensor)}'
+        if tensor is not None:
+            opts_str += f'-fbn {" ".join(str(x) for x in tensor)}'
 
-    if pad is True:
-        opts_str += '-psf '
+        if pad is True:
+            opts_str += "-psf "
 
-    cmd_str += opts_str + '  '
+        cmd_str += opts_str + "  "
 
-    if DEBUG:
-        print(cmd_str)
+        if verbose:
+            print(cmd_str)
 
-    if call_niftyreg(cmd_str, verbose):
-        return dict(res=read_nifti(res))
-    else:
-        return None
+        if call_niftyreg(cmd_str, verbose):
+            return dict(res=read_nifti(res))
+        else:
+            return None
 
 
 def jacobian(trans, ref, jac=None, jacM=None, jacL=None):
     raise NotImplementedError
 
 
-def average(output, avg=None, avg_lts=None, avg_tran=None, demean1=None,
-            demean2=None, demean3=None, version=None):
+def average(
+    output,
+    avg=None,
+    avg_lts=None,
+    avg_tran=None,
+    demean1=None,
+    demean2=None,
+    demean3=None,
+    verbose=False,
+):
 
-    usage_string = 'reg_average <outputFileName> [OPTIONS]'
+    usage_string = "reg_average <outputFileName> [OPTIONS]"
 
-    cmd_str = 'reg_average '
-
-    if output is None:
-        cmd_str += f'{NAME}output.nii '
-    else:
-        cmd_str += f'{output} '
-
-    if avg is not None:
-        if not any(isinstance(x, np.ndarray) for x in avg):
-            cmd_str += f'-avg {" ".join(str(x) for x in avg)} '
-            pipe = sp.Popen(sh.split(cmd_str), stdout=sp.PIPE, stderr=sp.PIPE)
-            retcode, err = pipe.communicate()
+    cmd_str = "reg_average "
+    with tmp.TemporaryDirectory() as tmp_folder:
+        tmp_folder += path.sep
+        if output is None:
+            cmd_str += f"{tmp_folder}output.nii "
         else:
-            raise NotImplementedError
+            cmd_str += f"{output} "
 
-    if avg_lts is not None:
-        if not any(isinstance(x, np.ndarray) for x in avg_lts):
-            cmd_str += f'-avg_lts {" ".join(str(x) for x in avg_lts)} '
-            pipe = sp.Popen(sh.split(cmd_str), stdout=sp.PIPE, stderr=sp.PIPE)
-            retcode, err = pipe.communicate()
+        if avg is not None:
+            if not any(isinstance(x, np.ndarray) for x in avg):
+                cmd_str += f'-avg {" ".join(str(x) for x in avg)} '
+                pipe = sp.Popen(sh.split(cmd_str), stdout=sp.PIPE, stderr=sp.PIPE)
+                retcode, err = pipe.communicate()
+            else:
+                raise NotImplementedError
+
+        if avg_lts is not None:
+            if not any(isinstance(x, np.ndarray) for x in avg_lts):
+                cmd_str += f'-avg_lts {" ".join(str(x) for x in avg_lts)} '
+                pipe = sp.Popen(sh.split(cmd_str), stdout=sp.PIPE, stderr=sp.PIPE)
+                retcode, err = pipe.communicate()
+            else:
+                raise NotImplementedError
+
+        if avg_tran is not None:
+            if not any(isinstance(x, np.ndarray) for x in avg_tran):
+                cmd_str += f'-avg_tran {" ".join(str(x) for x in avg_tran)} '
+                pipe = sp.Popen(sh.split(cmd_str), stdout=sp.PIPE, stderr=sp.PIPE)
+                retcode, err = pipe.communicate()
+            else:
+                raise NotImplementedError
+
+        if demean1 is not None:
+            if not any(isinstance(x, np.ndarray) for x in demean1):
+                cmd_str += f'-demean1 {" ".join(str(x) for x in demean1)} '
+                pipe = sp.Popen(sh.split(cmd_str), stdout=sp.PIPE, stderr=sp.PIPE)
+                retcode, err = pipe.communicate()
+            else:
+                raise NotImplementedError
+
+        if demean2 is not None:
+            if not any(isinstance(x, np.ndarray) for x in demean2):
+                cmd_str += f'-demean2 {" ".join(str(x) for x in demean2)} '
+                pipe = sp.Popen(sh.split(cmd_str), stdout=sp.PIPE, stderr=sp.PIPE)
+                retcode, err = pipe.communicate()
+            else:
+                raise NotImplementedError
+
+        if demean3 is not None:
+            if not any(isinstance(x, np.ndarray) for x in demean3):
+                cmd_str += f'-demean3 {" ".join(str(x) for x in demean3)} '
+                pipe = sp.Popen(sh.split(cmd_str), stdout=sp.PIPE, stderr=sp.PIPE)
+                retcode, err = pipe.communicate()
+            else:
+                raise NotImplementedError
+
+        if verbose:
+            print(cmd_str)
+
+
+def tools(
+    input,
+    output=None,
+    float=None,
+    down=None,
+    smoS=None,
+    smoG=None,
+    smoL=None,
+    add=None,
+    sub=None,
+    mul=None,
+    div=None,
+    rms=None,
+    bin=None,
+    thr=None,
+    nan=None,
+    iso=None,
+    noscl=None,
+    version=None,
+    verbose=False,
+):
+
+    cmd_str = "reg_tools "
+    with tmp.TemporaryDirectory() as tmp_folder:
+        tmp_folder += path.sep
+
+        write_nifti(f"{tmp_folder}input.nii", input)
+        cmd_str += f"-in {tmp_folder}input.nii -out {tmp_folder}output.nii "
+
+        if float is not None:
+            cmd_str += "-float "
+
+        if down is not None:
+            cmd_str += "-down "
+
+        if smoS is not None:
+            smoS = ((smoS,) * 3) if np.isscalar(smoS) else smoS
+            cmd_str += f'-smoS {" ".join(str(x) for x in smoS)}'
+
+        if smoG is not None:
+            smoG = ((smoG,) * 3) if np.isscalar(smoG) else smoG
+            cmd_str += f'-smoG {" ".join(str(x) for x in smoG)}'
+
+        if smoL is not None:
+            smoL = ((smoL,) * 3) if np.isscalar(smoL) else smoL
+            cmd_str += f'-smoL {" ".join(str(x) for x in smoL)}'
+
+        if add is not None:
+            if isinstance(add, np.ndarray):
+                write_nifti(add, f"{tmp_folder}add.nii")
+                cmd_str += f"-add {tmp_folder}add.nii "
+            else:
+                cmd_str += f"-add {add}"
+
+        if sub is not None:
+            if isinstance(sub, np.ndarray):
+                write_nifti(sub, f"{tmp_folder}sub.nii")
+                cmd_str += f"-sub {tmp_folder}sub.nii "
+            else:
+                cmd_str += f"-sub {sub}"
+
+        if mul is not None:
+            if isinstance(mul, np.ndarray):
+                write_nifti(mul, f"{tmp_folder}mul.nii")
+                cmd_str += f"-mul {tmp_folder}mul.nii "
+            else:
+                cmd_str += f"-mul {mul}"
+
+        if div is not None:
+            if isinstance(div, np.ndarray):
+                write_nifti(div, f"{tmp_folder}div.nii")
+                cmd_str += f"-div {tmp_folder}div.nii "
+            else:
+                cmd_str += f"-div {div}"
+
+        if bin is not None:
+            cmd_str += "-bin "
+
+        if thr is not None:
+            cmd_str += f"-thr {thr} "
+
+        if nan is not None:
+            if isinstance(nan, np.ndarray):
+                write_nifti(nan, f"{tmp_folder}/nan.nii")
+                cmd_str += f"-nan {tmp_folder}/nan.nii "
+            else:
+                cmd_str += f"-nan {nan}"
+
+        if iso is not None:
+            cmd_str += "-iso "
+
+        if noscl is not None:
+            cmd_str += "-noscl "
+
+        if version is not None:
+            cmd_str += "--version "
+
+        if verbose:
+            print(cmd_str)
+
+        if call_niftyreg(cmd_str):
+            return read_nifti(f"{tmp_folder}output.nii")
         else:
-            raise NotImplementedError
-
-    if avg_tran is not None:
-        if not any(isinstance(x, np.ndarray) for x in avg_tran):
-            cmd_str += f'-avg_tran {" ".join(str(x) for x in avg_tran)} '
-            pipe = sp.Popen(sh.split(cmd_str), stdout=sp.PIPE, stderr=sp.PIPE)
-            retcode, err = pipe.communicate()
-        else:
-            raise NotImplementedError
-
-    if demean1 is not None:
-        if not any(isinstance(x, np.ndarray) for x in demean1):
-            cmd_str += f'-demean1 {" ".join(str(x) for x in demean1)} '
-            pipe = sp.Popen(sh.split(cmd_str), stdout=sp.PIPE, stderr=sp.PIPE)
-            retcode, err = pipe.communicate()
-        else:
-            raise NotImplementedError
-
-    if demean2 is not None:
-        if not any(isinstance(x, np.ndarray) for x in demean2):
-            cmd_str += f'-demean2 {" ".join(str(x) for x in demean2)} '
-            pipe = sp.Popen(sh.split(cmd_str), stdout=sp.PIPE, stderr=sp.PIPE)
-            retcode, err = pipe.communicate()
-        else:
-            raise NotImplementedError
-
-    if demean3 is not None:
-        if not any(isinstance(x, np.ndarray) for x in demean3):
-            cmd_str += f'-demean3 {" ".join(str(x) for x in demean3)} '
-            pipe = sp.Popen(sh.split(cmd_str), stdout=sp.PIPE, stderr=sp.PIPE)
-            retcode, err = pipe.communicate()
-        else:
-            raise NotImplementedError
-
-    if DEBUG:
-        print(cmd_str)
-
-
-def tools(input, output=None, float=None, down=None, smoS=None, smoG=None,
-          smoL=None, add=None, sub=None, mul=None, div=None, rms=None,
-          bin=None, thr=None, nan=None, iso=None, noscl=None, version=None,
-          verbose=False):
-
-    cmd_str = 'reg_tools '
-
-    write_nifti(f'{NAME}input.nii', input)
-    cmd_str += f'-in {NAME}input.nii -out {NAME}output.nii '
-
-    if float is not None:
-        cmd_str += '-float '
-
-    if down is not None:
-        cmd_str += '-down '
-
-    if smoS is not None:
-        smoS = ((smoS, ) * 3) if np.isscalar(smoS) else smoS
-        cmd_str += f'-smoS {" ".join(str(x) for x in smoS)}'
-
-    if smoG is not None:
-        smoG = ((smoG, ) * 3) if np.isscalar(smoG) else smoG
-        cmd_str += f'-smoG {" ".join(str(x) for x in smoG)}'
-
-    if smoL is not None:
-        smoL = ((smoL, ) * 3) if np.isscalar(smoL) else smoL
-        cmd_str += f'-smoL {" ".join(str(x) for x in smoL)}'
-
-    if add is not None:
-        if isinstance(add, np.ndarray):
-            write_nifti(add, f'{NAME}add')
-            cmd_str += f'-add {NAME}add.nii '
-        else:
-            cmd_str += f'-add {add}'
-
-    if sub is not None:
-        if isinstance(sub, np.ndarray):
-            write_nifti(sub, f'{NAME}sub')
-            cmd_str += f'-sub {NAME}sub.nii '
-        else:
-            cmd_str += f'-sub {sub}'
-
-    if mul is not None:
-        if isinstance(mul, np.ndarray):
-            write_nifti(mul, f'{NAME}mul')
-            cmd_str += f'-mul {NAME}mul.nii '
-        else:
-            cmd_str += f'-mul {mul}'
-
-    if div is not None:
-        if isinstance(div, np.ndarray):
-            write_nifti(div, f'{NAME}div')
-            cmd_str += f'-div {NAME}div.nii '
-        else:
-            cmd_str += f'-div {div}'
-
-    if bin is not None:
-        cmd_str += '-bin '
-
-    if thr is not None:
-        cmd_str += f'-thr {thr} '
-
-    if nan is not None:
-        if isinstance(nan, np.ndarray):
-            write_nifti(nan, f'{NAME}nan')
-            cmd_str += f'-nan {NAME}nan.nii '
-        else:
-            cmd_str += f'-nan {nan}'
-
-    if iso is not None:
-        cmd_str += '-iso '
-
-    if noscl is not None:
-        cmd_str += '-noscl '
-
-    if version is not None:
-        cmd_str += '--version '
-
-    if DEBUG:
-        print(cmd_str)
-
-    if call_niftyreg(cmd_str):
-        return read_nifti(f'{NAME}output.nii')
-    else:
-        return None
+            return None
