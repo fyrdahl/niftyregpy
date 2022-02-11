@@ -1,5 +1,5 @@
 import sys
-from setuptools import setup, find_packages
+from setuptools import setup
 
 if sys.version_info < (3, 6):
     sys.exit('Python < 3.6 is not supported')
@@ -19,7 +19,6 @@ setup(
         "Operating System :: OS X",
         "Operating System :: Linux"
     ],
-    ext_modules = [],
-    package_dir = {},
-    packages = ["niftyregpy","niftyregpy.utils", "niftyregpy.reg", "niftyregpy.tools", "niftyregpy.average", "niftyregpy.apps"],
+    install_requires=REQUIRED_PACKAGES,
+    packages=["niftyregpy","niftyregpy.utils", "niftyregpy.reg", "niftyregpy.tools", "niftyregpy.average", "niftyregpy.apps"],
 )
