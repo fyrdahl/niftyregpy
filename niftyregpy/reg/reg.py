@@ -141,7 +141,7 @@ def aladin(
             print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
-            return dict(aff=read_txt(aff), res=read_nifti(res))
+            return read_txt(aff), read_nifti(res)
         else:
             return None
 
@@ -372,7 +372,7 @@ def f3d(
             print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
-            return dict(res=read_nifti(res), cpp=read_nifti(cpp))
+            return read_nifti(res), read_nifti(cpp)
         else:
             return None
 
@@ -440,7 +440,7 @@ def transform(
             print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
-            return dict(res=read_nifti(res))
+            return read_nifti(res)
         else:
             return None
 
