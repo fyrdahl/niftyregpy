@@ -12,7 +12,7 @@ def aladin(
     ref,
     flo,
     noSym=None,
-    regOnly=None,
+    rigOnly=None,
     affDirect=None,
     aff=None,
     inaff=None,
@@ -69,8 +69,8 @@ def aladin(
         if noSym is True:
             opts_str += "-noSym "
 
-        if regOnly is True:
-            opts_str += "-regOnly "
+        if rigOnly is True:
+            opts_str += "-rigOnly "
 
         if affDirect is True:
             opts_str += "-affDirect "
