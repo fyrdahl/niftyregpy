@@ -76,13 +76,16 @@ def aladin(
             opts_str += "-affDirect "
 
         if inaff is not None:
-            opts_str += f"-inaff {inaff} "
+            write_txt(f"{tmp_folder}inaff.txt", inaff)
+            opts_str += f"-inaff {tmp_folder}inaff.txt "
 
         if rmask is not None:
-            opts_str += f"-rmask {rmask} "
+            write_nifti(f"{tmp_folder}rmask.nii", rmask)
+            opts_str += f"-rmask {tmp_folder}rmask.nii "
 
         if fmask is not None:
-            opts_str += f"-fmask {fmask} "
+            write_nifti(f"{tmp_folder}fmask.nii", fmask)
+            opts_str += f"-fmask {tmp_folder}fmask.nii "
 
         if maxit is not None:
             opts_str += f"-maxit {maxit} "
@@ -348,8 +351,8 @@ def f3d(
             opts_str += "-vel "
 
         if fmask is not None:
-            write_nifti(f"{NAME}fmask.nii", rmask)
-            opts_str += f"-fmask {NAME}fmask.nii "
+            write_nifti(f"{tmp_folder}fmask.nii", fmask)
+            opts_str += f"-fmask {Ntmp_folder}fmask.nii "
 
         if omp is not None:
             opts_str += f"-lp {int(omp)} "
@@ -419,8 +422,8 @@ def transform(
             res = NAME + "res.nii"
 
         if blank is not None:
-            write_nifti(f"{NAME}blank.nii", blank)
-            opts_str += f"-blank {NAME}blank.nii "
+            write_nifti(f"{tmp_folder}blank.nii", blank)
+            opts_str += f"-blank {tmp_folder}blank.nii "
 
         if inter is not None:
             opts_str += f"-inter {int(inter)} "

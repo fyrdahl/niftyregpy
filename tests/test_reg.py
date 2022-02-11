@@ -18,6 +18,45 @@ class TestReg():
         output = reg.aladin(noisy_ref, noisy_flo, verbose=False)
         assert output is not None
 
+    def test_aladin_rigonly(self):
+        size = common.random_float(self.length / 8, self.length * 7 / 8)
+        ref = common.create_rect(self.length, w=size, h=size)
+        flo = common.create_rect(self.length, w=size, h=size)
+        noisy_ref = common.add_noise(ref)
+        noisy_flo = common.add_noise(flo)
+        output = reg.aladin(noisy_ref, noisy_flo, rigOnly=True, verbose=False)
+        assert output is not None
+
+    def test_aladin_inaff(self):
+        size = common.random_float(self.length / 8, self.length * 7 / 8)
+        ref = common.create_rect(self.length, w=size, h=size)
+        flo = common.create_rect(self.length, w=size, h=size)
+        noisy_ref = common.add_noise(ref)
+        noisy_flo = common.add_noise(flo)
+        aff,_ = reg.aladin(noisy_ref, noisy_flo, verbose=False)
+        output = reg.aladin(noisy_ref, noisy_flo, inaff=aff, verbose=True)
+        assert output is not None
+
+    def test_aladin_rmask(self):
+        size = common.random_float(self.length / 8, self.length * 7 / 8)
+        ref = common.create_rect(self.length, w=size, h=size)
+        flo = common.create_rect(self.length, w=size, h=size)
+        noisy_ref = common.add_noise(ref)
+        noisy_flo = common.add_noise(flo)
+        mask = common.create_circle(self.length)
+        output = reg.aladin(noisy_ref, noisy_flo, rmask=mask, verbose=True)
+        assert output is not None
+
+    def test_aladin_fmask(self):
+        size = common.random_float(self.length / 8, self.length * 7 / 8)
+        ref = common.create_rect(self.length, w=size, h=size)
+        flo = common.create_rect(self.length, w=size, h=size)
+        noisy_ref = common.add_noise(ref)
+        noisy_flo = common.add_noise(flo)
+        mask = common.create_circle(self.length)
+        output = reg.aladin(noisy_ref, noisy_flo, fmask=mask, verbose=True)
+        assert output is not None
+
     def test_f3d_default(self):
         rad_ref = common.random_float(self.length / 8, self.length * 7 / 8)
         ref = common.create_circle(self.length, r=rad_ref)
