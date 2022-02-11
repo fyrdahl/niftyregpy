@@ -1,4 +1,10 @@
-from distutils.core import setup
+import sys
+from distutils.core import setup, find_packages
+
+if sys.version_info < (3, 6):
+    sys.exit('Python < 3.6 is not supported')
+
+REQUIRED_PACKAGES = ['numpy', 'nibabel']
 
 setup(
     name="niftyregpy",
