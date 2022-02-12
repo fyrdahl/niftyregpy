@@ -352,7 +352,7 @@ def f3d(
 
         if fmask is not None:
             write_nifti(f"{tmp_folder}fmask.nii", fmask)
-            opts_str += f"-fmask {Ntmp_folder}fmask.nii "
+            opts_str += f"-fmask {tmp_folder}fmask.nii "
 
         if omp is not None:
             opts_str += f"-lp {int(omp)} "
