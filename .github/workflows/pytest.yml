@@ -28,8 +28,8 @@ jobs:
 
       - name: Install NiftyReg
         run: |
-          git clone https://git.code.sf.net/p/niftyreg/git niftyreg-git
-          cd niftyreg-git
+          git clone https://github.com/KCL-BMEIS/niftyreg.git
+          cd niftyreg
           mkdir build
           cd build
           cmake ../
