@@ -5,20 +5,20 @@ on:
     branches:
       - main
     paths-ignore:
-      - '**/README.md'
+      - "**/README.md"
 
 jobs:
   test:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
-          python-version: '3.x'
+          python-version: "3.x"
 
       - name: Install dependencies
         run: |
@@ -26,9 +26,14 @@ jobs:
           pip install pytest
           pip install -r requirements.txt
 
+      - name: Clone NiftyReg
+        uses: actions/checkout@v3
+        with:
+          repository: KCL-BMEIS/niftyreg
+          path: niftyreg
+
       - name: Install NiftyReg
         run: |
-          git clone https://github.com/KCL-BMEIS/niftyreg.git
           cd niftyreg
           mkdir build
           cd build
