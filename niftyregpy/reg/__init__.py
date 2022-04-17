@@ -1,1 +1,1 @@
-from .reg import aladin, f3d, transform, jacobian, average, tools
+from .reg import aladin, f3d, jacobian, tools, transform
