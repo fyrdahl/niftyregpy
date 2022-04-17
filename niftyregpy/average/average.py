@@ -158,7 +158,7 @@ def demean1(ref, aff, flo, verbose=False):
             print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
-            return read_nifti(f"{tmp_folder}output.nii")
+            return read_nifti(os.path.join(tmp_folder, "output.nii"))
         else:
             return None
 
@@ -187,7 +187,7 @@ def demean2(ref, tran, flo, verbose=False):
             print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
-            return read_nifti(f"{tmp_folder}output.nii")
+            return read_nifti(os.path.join(tmp_folder, "output.nii"))
         else:
             return None
 
@@ -197,7 +197,7 @@ def demean3(ref, aff, tran, flo, verbose=False):
     with tmp.TemporaryDirectory() as tmp_folder:
 
         cmd_str = "reg_average "
-        cmd_str += os.path.join(tmp_folder, "output.nii") + "-demean3 "
+        cmd_str += os.path.join(tmp_folder, "output.nii") + " -demean3 "
 
         write_nifti(os.path.join(tmp_folder, "ref.nii"), ref)
         cmd_str += os.path.join(tmp_folder, "ref.nii") + " "
@@ -219,6 +219,6 @@ def demean3(ref, aff, tran, flo, verbose=False):
             print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
-            return read_nifti(f"{tmp_folder}output.nii")
+            return read_nifti(os.path.join(tmp_folder, "output.nii"))
         else:
             return None
