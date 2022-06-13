@@ -64,16 +64,16 @@ class TestReg:
     def test_f3d_nmi(self):
         size = common.random_float(self.length / 8, self.length * 7 / 8)
         ref = common.create_rect(self.length, w=size, h=size)
-        np.save("/Users/alefyr/ref.npy", ref)
+
         flo = transform.swirl(
             ref,
             center=(self.length // 2, self.length // 2),
             strength=10,
             radius=size,
         )
-        np.save("/Users/alefyr/flo.npy", flo)
+
         output = reg.f3d(ref, flo, pad=0, nmi=True, rbn=2, fbn=2, verbose=True)
-        np.save("/Users/alefyr/out_nmi.npy", output[0])
+
         assert 1 - common.jaccard(ref, output[0]) < 1
 
     def test_f3d_lncc(self):
@@ -86,7 +86,7 @@ class TestReg:
             radius=size,
         )
         output = reg.f3d(ref, flo, pad=0, lncc=3, verbose=True)
-        np.save("/Users/alefyr/out_lncc.npy", output[0])
+
         assert 1 - common.jaccard(ref, output[0]) < 1
 
     def test_f3d_ssd(self):
@@ -99,7 +99,7 @@ class TestReg:
             radius=size,
         )
         output = reg.f3d(ref, flo, pad=0, ssd=True, verbose=True)
-        np.save("/Users/alefyr/out_ssd.npy", output[0])
+
         assert 1 - common.jaccard(ref, output[0]) < 1
 
     def test_f3d_kld(self):
@@ -112,7 +112,7 @@ class TestReg:
             radius=size,
         )
         output = reg.f3d(ref, flo, pad=0, kld=True, verbose=True)
-        np.save("/Users/alefyr/out_kld.npy", output[0])
+
         assert 1 - common.jaccard(ref, output[0]) < 1
 
     def test_reg_float(self):
