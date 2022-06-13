@@ -1,7 +1,8 @@
 import shlex
-import numpy as np
-import nibabel as nib
 import subprocess as sp
+
+import nibabel as nib
+import numpy as np
 
 
 def read_nifti(name: str) -> np.array:
@@ -16,12 +17,10 @@ def read_nifti(name: str) -> np.array:
 def write_nifti(name, array, __affine=None) -> bool:
 
     try:
-        nib.save(nib.Nifti1Image(array, affine=__affine), name)
+        nib.save(nib.Nifti1Image(np.atleast_3d(array), affine=__affine), name)
         return True
     except Exception as e:
         raise e
-    else:
-        return False
 
 
 def read_txt(name: str):
@@ -40,35 +39,36 @@ def write_txt(name: str, array) -> bool:
         return True
     except Exception as e:
         raise e
-    else:
-        return False
 
 
-def call_niftyreg(cmd_str: str, verbose=False) -> bool:
+def call_niftyreg(cmd_str: str, verbose=False, output_stdout=False) -> bool:
 
     p = sp.Popen(shlex.split(cmd_str), stdout=sp.PIPE, stderr=sp.PIPE)
     stdout, stderr = p.communicate()
 
     if verbose:
-        for line in stdout.decode(encoding='utf-8').split('\n'):
+        for line in stdout.decode(encoding="utf-8").split("\n"):
             print(line)
-        for line in stderr.decode(encoding='utf-8').split('\n'):
+        for line in stderr.decode(encoding="utf-8").split("\n"):
             print(line)
 
     if stderr:
         return False
-    else:
-        return True
+
+    if output_stdout:
+        return stdout.decode(encoding="utf-8")
+
+    return True
 
 
 def get_help_string(tool: str) -> str:
 
-    cmd_str = f'{tool} --help'
+    cmd_str = f"{tool} --help"
 
     p = sp.Popen(shlex.split(cmd_str), stdout=sp.PIPE, stderr=sp.PIPE)
-    stdout, stderr = p.communicate()
+    stdout, _ = p.communicate()
 
     if stdout:
         return stdout
-    else:
-        return None
+
+    return None

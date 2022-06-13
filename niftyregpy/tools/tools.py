@@ -1,3 +1,4 @@
+import builtins
 import tempfile as tmp
 from os import path
 
@@ -6,7 +7,7 @@ import numpy as np
 from ..utils import call_niftyreg, read_nifti, write_nifti
 
 
-def float(input, verbose=False):
+def float(input, output=None, verbose=False):
 
     """
     The input image is converted to float
@@ -14,23 +15,25 @@ def float(input, verbose=False):
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        tmp_folder += path.sep
-        cmd_str = (
-            f"reg_tools -in {tmp_folder}input.nii -out {tmp_folder}output.nii -float "
-        )
+        cmd_str = f"reg_tools -in {path.join(tmp_folder, 'input.nii')}"
 
-        write_nifti(f"{tmp_folder}input.nii", input)
+        if output is None:
+            output = path.join(tmp_folder, "output.nii")
+
+        cmd_str += f" -out {output}"
+        cmd_str += " -float"
+
+        write_nifti(path.join(tmp_folder, "input.nii"), input)
 
         if verbose:
             print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
-            return read_nifti(f"{tmp_folder}output.nii")
-        else:
-            return None
+            return read_nifti(output)
+        return None
 
 
-def down(input, verbose=False):
+def down(input, output=None, verbose=False):
 
     """
     The input image is downsampled 2 times
@@ -38,44 +41,52 @@ def down(input, verbose=False):
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        tmp_folder += path.sep
-        cmd_str = (
-            f"reg_tools -in {tmp_folder}input.nii -out {tmp_folder}output.nii -down "
-        )
-        write_nifti(f"{tmp_folder}input.nii", input)
+        cmd_str = f"reg_tools -in {path.join(tmp_folder, 'input.nii')}"
+
+        if output is None:
+            output = path.join(tmp_folder, "output.nii")
+
+        cmd_str += f" -out {output}"
+        cmd_str += " -down"
+
+        write_nifti(path.join(tmp_folder, "input.nii"), input)
 
         if verbose:
             print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
-            return read_nifti(f"{tmp_folder}output.nii")
-        else:
-            return None
+            return read_nifti(output)
+        return None
 
 
-def smoS(input, sx=0.0, sy=0.0, sz=0.0, verbose=False):
+def smoS(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
 
     """
     The input image is smoothed using a cubic b-spline kernel
     """
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        tmp_folder += path.sep
-        cmd_str = f"reg_tools -in {tmp_folder}input.nii -out {tmp_folder}output.nii "
-        cmd_str += f"-smoS {sx} {sy} {sz} "
+        cmd_str = "reg_tools"
 
-        write_nifti(f"{tmp_folder}input.nii", input)
+        write_nifti(path.join(tmp_folder, "input.nii"), input)
+        cmd_str += " -in " + path.join(tmp_folder, "input.nii")
+
+        if output is None:
+            output = path.join(tmp_folder, "output.nii")
+
+        cmd_str += " -out " + output
+        cmd_str += f" -smoS {sx} {sy} {sz} "
 
         if verbose:
             print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
-            return read_nifti(f"{tmp_folder}output.nii")
-        else:
-            return None
+            return read_nifti(output)
+
+        return None
 
 
-def smoG(input, sx=0.0, sy=0.0, sz=0.0, verbose=False):
+def smoG(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
 
     """
     The input image is smoothed using a Gaussian kernel
@@ -83,22 +94,27 @@ def smoG(input, sx=0.0, sy=0.0, sz=0.0, verbose=False):
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        tmp_folder += path.sep
-        cmd_str = f"reg_tools -in {tmp_folder}input.nii -out {tmp_folder}output.nii "
-        cmd_str += f"-smoG {sx} {sy} {sz} "
+        cmd_str = "reg_tools"
 
-        write_nifti(f"{tmp_folder}input.nii", input)
+        write_nifti(path.join(tmp_folder, "input.nii"), input)
+        cmd_str += " -in " + path.join(tmp_folder, "input.nii")
+
+        if output is None:
+            output = path.join(tmp_folder, "output.nii")
+
+        cmd_str += " -out " + output
+        cmd_str += f" -smoG {sx} {sy} {sz} "
 
         if verbose:
             print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
-            return read_nifti(f"{tmp_folder}output.nii")
-        else:
-            return None
+            return read_nifti(output)
+
+        return None
 
 
-def smoL(input, sx=0.0, sy=0.0, sz=0.0, verbose=False):
+def smoL(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
 
     """
     The input label image is smoothed using a Gaussian kernel
@@ -106,22 +122,27 @@ def smoL(input, sx=0.0, sy=0.0, sz=0.0, verbose=False):
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        tmp_folder += path.sep
-        cmd_str = f"reg_tools -in {tmp_folder}input.nii -out {tmp_folder}output.nii "
-        cmd_str += f"-smoL {sx} {sy} {sz} "
+        cmd_str = "reg_tools"
 
-        write_nifti(f"{tmp_folder}input.nii", input)
+        write_nifti(path.join(tmp_folder, "input.nii"), input)
+        cmd_str += " -in " + path.join(tmp_folder, "input.nii")
+
+        if output is None:
+            output = path.join(tmp_folder, "output.nii")
+
+        cmd_str += " -out " + output
+        cmd_str += f" -smoL {sx} {sy} {sz} "
 
         if verbose:
             print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
-            return read_nifti(f"{tmp_folder}output.nii")
-        else:
-            return None
+            return read_nifti(output)
+
+        return None
 
 
-def add(input, x, verbose=False):
+def add(input, x, output=None, verbose=False):
 
     """
     This image (or value) is added to the input
@@ -129,27 +150,32 @@ def add(input, x, verbose=False):
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        tmp_folder += path.sep
-        cmd_str = f"reg_tools -in {tmp_folder}input.nii -out {tmp_folder}output.nii "
+        cmd_str = "reg_tools"
+
+        write_nifti(path.join(tmp_folder, "input.nii"), input)
+        cmd_str += " -in " + path.join(tmp_folder, "input.nii")
+
+        if output is None:
+            output = path.join(tmp_folder, "output.nii")
+
+        cmd_str += " -out " + output
 
         if np.isscalar(x):
-            cmd_str += f"-add {x}"
+            cmd_str += f" -add {x}"
         else:
-            cmd_str += f"-add {tmp_folder}x.nii"
-            write_nifti(f"{tmp_folder}x.nii", x)
-
-        write_nifti(f"{tmp_folder}input.nii", input)
+            write_nifti(path.join(tmp_folder, "x.nii"), x)
+            cmd_str += " -add " + path.join(tmp_folder, "x.nii")
 
         if verbose:
             print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
-            return read_nifti(f"{tmp_folder}output.nii")
-        else:
-            return None
+            return read_nifti(output)
+
+        return None
 
 
-def sub(input, x, verbose=False):
+def sub(input, x, output=None, verbose=False):
 
     """
     This image (or value) is subtracted from the input
@@ -157,27 +183,32 @@ def sub(input, x, verbose=False):
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        tmp_folder += path.sep
-        cmd_str = f"reg_tools -in {tmp_folder}input.nii -out {tmp_folder}output.nii "
+        cmd_str = "reg_tools"
+
+        write_nifti(path.join(tmp_folder, "input.nii"), input)
+        cmd_str += " -in " + path.join(tmp_folder, "input.nii")
+
+        if output is None:
+            output = path.join(tmp_folder, "output.nii")
+
+        cmd_str += " -out " + output
 
         if np.isscalar(x):
-            cmd_str += f"-sub {x}"
+            cmd_str += f" -sub {x}"
         else:
-            cmd_str += f"-sub {tmp_folder}x.nii"
-            write_nifti(f"{tmp_folder}x.nii", x)
-
-        write_nifti(f"{tmp_folder}input.nii", input)
+            write_nifti(path.join(tmp_folder, "x.nii"), x)
+            cmd_str += " -sub " + path.join(tmp_folder, "x.nii")
 
         if verbose:
             print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
-            return read_nifti(f"{tmp_folder}output.nii")
-        else:
-            return None
+            return read_nifti(output)
+
+        return None
 
 
-def mul(input, x, verbose=False):
+def mul(input, x, output=None, verbose=False):
 
     """
     This image (or value) is multiplied with the input
@@ -185,27 +216,32 @@ def mul(input, x, verbose=False):
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        tmp_folder += path.sep
-        cmd_str = f"reg_tools -in {tmp_folder}input.nii -out {tmp_folder}output.nii "
+        cmd_str = "reg_tools"
+
+        write_nifti(path.join(tmp_folder, "input.nii"), input)
+        cmd_str += " -in " + path.join(tmp_folder, "input.nii")
+
+        if output is None:
+            output = path.join(tmp_folder, "output.nii")
+
+        cmd_str += " -out " + output
 
         if np.isscalar(x):
-            cmd_str += f"-mul {x}"
+            cmd_str += f" -mul {x}"
         else:
-            cmd_str += f"-mul {tmp_folder}x.nii"
-            write_nifti(f"{tmp_folder}x.nii", x)
-
-        write_nifti(f"{tmp_folder}input.nii", input)
+            write_nifti(path.join(tmp_folder, "x.nii"), x)
+            cmd_str += " -mul " + path.join(tmp_folder, "x.nii")
 
         if verbose:
             print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
-            return read_nifti(f"{tmp_folder}output.nii")
-        else:
-            return None
+            return read_nifti(output)
+
+        return None
 
 
-def div(input, x, verbose=False):
+def div(input, x, output=None, verbose=False):
 
     """
     This image (or value) is divided to the input
@@ -213,24 +249,29 @@ def div(input, x, verbose=False):
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        tmp_folder += path.sep
-        cmd_str = f"reg_tools -in {tmp_folder}input.nii -out {tmp_folder}output.nii "
+        cmd_str = "reg_tools"
+
+        write_nifti(path.join(tmp_folder, "input.nii"), input)
+        cmd_str += " -in " + path.join(tmp_folder, "input.nii")
+
+        if output is None:
+            output = path.join(tmp_folder, "output.nii")
+
+        cmd_str += " -out " + output
 
         if np.isscalar(x):
-            cmd_str += f"-div {x}"
+            cmd_str += f" -div {x}"
         else:
-            cmd_str += f"-div {tmp_folder}x.nii"
-            write_nifti(f"{tmp_folder}x.nii", x)
-
-        write_nifti(f"{tmp_folder}input", input)
+            write_nifti(path.join(tmp_folder, "x.nii"), x)
+            cmd_str += " -div " + path.join(tmp_folder, "x.nii")
 
         if call_niftyreg(cmd_str, verbose):
-            return read_nifti(f"{tmp_folder}output.nii")
-        else:
-            return None
+            return read_nifti(output)
+
+        return None
 
 
-def rms(input, x, verbose=False):
+def rms(input, x, output=None, verbose=False):
 
     """
     Compute the mean rms between both images
@@ -238,22 +279,31 @@ def rms(input, x, verbose=False):
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        tmp_folder += path.sep
-        cmd_str = f"reg_tools -in {tmp_folder}input.nii -out {tmp_folder}output.nii -rms {tmp_folder}x.nii "
+        cmd_str = "reg_tools"
 
-        write_nifti(f"{tmp_folder}input.nii", input)
-        write_nifti(f"{tmp_folder}x.nii", x)
+        write_nifti(path.join(tmp_folder, "input.nii"), input)
+        write_nifti(path.join(tmp_folder, "x.nii"), x)
+
+        cmd_str += " -in " + path.join(tmp_folder, "input.nii")
+
+        if output is None:
+            output = path.join(tmp_folder, "output.nii")
+
+        cmd_str += " -out " + output
+        cmd_str += " -rms " + path.join(tmp_folder, "x.nii")
 
         if verbose:
             print(cmd_str)
 
-        if call_niftyreg(cmd_str, verbose):
-            return read_nifti(f"{tmp_folder}output.nii")
-        else:
-            return None
+        out = call_niftyreg(cmd_str, verbose, output_stdout=True)
+
+        if out:
+            return builtins.float(out)
+
+        return None
 
 
-def bin(input, verbose=False):
+def bin(input, output=None, verbose=False):
 
     """
     Binarise the input image (val!=0?val=1:val=0)
@@ -261,20 +311,24 @@ def bin(input, verbose=False):
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        tmp_folder += path.sep
-        cmd_str = (
-            f"reg_tools -in {tmp_folder}input.nii -out {tmp_folder}output.nii -bin "
-        )
+        cmd_str = "reg_tools"
 
-        write_nifti(f"{tmp_folder}input.nii", input)
+        write_nifti(path.join(tmp_folder, "input.nii"), input)
+        cmd_str += " -in " + path.join(tmp_folder, "input.nii")
+
+        if output is None:
+            output = path.join(tmp_folder, "output.nii")
+
+        cmd_str += " -out " + path.join(tmp_folder, "output.nii")
+        cmd_str += " -bin"
 
         if call_niftyreg(cmd_str, verbose):
-            return read_nifti(f"{tmp_folder}output.nii")
-        else:
-            return None
+            return read_nifti(output)
+
+        return None
 
 
-def thr(input, thr, verbose=False):
+def thr(input, thr, output=None, verbose=False):
 
     """
     Threshold the input image (val<thr?val=0:val=1)
@@ -282,20 +336,27 @@ def thr(input, thr, verbose=False):
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        cmd_str = f"reg_tools -in {tmp_folder}input.nii -out {tmp_folder}output.nii -thr {thr} "
+        cmd_str = "reg_tools"
 
-        write_nifti(f"{tmp_folder}input.nii", input)
+        write_nifti(path.join(tmp_folder, "input.nii"), input)
+        cmd_str += " -in " + path.join(tmp_folder, "input.nii")
+
+        if output is None:
+            output = path.join(tmp_folder, "output.nii")
+
+        cmd_str += " -out " + path.join(tmp_folder, "output.nii")
+        cmd_str += f" -thr {thr}"
 
         if verbose:
             print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
-            return read_nifti(f"{tmp_folder}output.nii")
-        else:
-            return None
+            return read_nifti(output)
+
+        return None
 
 
-def nan(input, x, verbose=False):
+def nan(input, x, output=None, verbose=False):
 
     """
     This image is used to mask the input image.
@@ -303,22 +364,28 @@ def nan(input, x, verbose=False):
     """
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        tmp_folder += path.sep
-        cmd_str = f"reg_tools -in {tmp_folder}input.nii -out {tmp_folder}output.nii -nan {tmp_folder}x.nii "
+        cmd_str = "reg_tools"
 
-        write_nifti(f"{tmp_folder}input.nii", input)
-        write_nifti(f"{tmp_folder}x.nii", x)
+        write_nifti(path.join(tmp_folder, "input.nii"), input)
+        write_nifti(path.join(tmp_folder, "x.nii"), x)
+        cmd_str += " -in " + path.join(tmp_folder, "input.nii")
+
+        if output is None:
+            output = path.join(tmp_folder, "output.nii")
+
+        cmd_str += " -out " + path.join(tmp_folder, "output.nii")
+        cmd_str += " -nan " + path.join(tmp_folder, "x.nii")
 
         if verbose:
             print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
-            return read_nifti(f"{tmp_folder}output.nii")
-        else:
-            return None
+            return read_nifti(output)
+
+        return None
 
 
-def iso(input, verbose=False):
+def iso(input, output=None, verbose=False):
 
     """
     The resulting image is made isotropic
@@ -326,23 +393,27 @@ def iso(input, verbose=False):
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        tmp_folder += path.sep
-        cmd_str = (
-            f"reg_tools -in {tmp_folder}input.nii -out {tmp_folder}output.nii -iso "
-        )
+        cmd_str = "reg_tools"
 
-        write_nifti(f"{tmp_folder}input.nii", input)
+        write_nifti(path.join(tmp_folder, "input.nii"), input)
+        cmd_str += " -in " + path.join(tmp_folder, "input.nii")
+
+        if output is None:
+            output = path.join(tmp_folder, "output.nii")
+
+        cmd_str += " -out " + path.join(tmp_folder, "output.nii")
+        cmd_str += " -iso"
 
         if verbose:
             print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
-            return read_nifti(f"{tmp_folder}output.nii")
-        else:
-            return None
+            return read_nifti(output)
+
+        return None
 
 
-def noscl(input, verbose=False):
+def noscl(input, output=None, verbose=False):
 
     """
     The scl_slope and scl_inter are set to 1 and 0 respectively
@@ -350,16 +421,21 @@ def noscl(input, verbose=False):
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        tmp_folder += path.sep
-        cmd_str = (
-            f"reg_tools -in {tmp_folder}input.nii -out {tmp_folder}output.nii -noscl "
-        )
-        write_nifti(f"{tmp_folder}input.nii", input)
+        cmd_str = "reg_tools"
+
+        write_nifti(path.join(tmp_folder, "input.nii"), input)
+        cmd_str += " -in " + path.join(tmp_folder, "input.nii")
+
+        if output is None:
+            output = path.join(tmp_folder, "output.nii")
+
+        cmd_str += " -out " + path.join(tmp_folder, "output.nii")
+        cmd_str += " -noscl"
 
         if verbose:
             print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
-            return read_nifti(f"{tmp_folder}output.nii")
-        else:
-            return None
+            return read_nifti(output)
+
+        return None

@@ -1,10 +1,26 @@
-import shlex as sh
-import subprocess as sp
 import tempfile as tmp
 from os import path
 
 import numpy as np
 
+from ..average import avg, avg_lts, avg_tran, demean1, demean2, demean3
+from ..tools import (
+    add,
+    bin,
+    div,
+    down,
+    float,
+    iso,
+    mul,
+    nan,
+    noscl,
+    rms,
+    smoG,
+    smoL,
+    smoS,
+    sub,
+    thr,
+)
 from ..utils import call_niftyreg, read_nifti, read_txt, write_nifti, write_txt
 
 
@@ -32,6 +48,7 @@ def aladin(
     cog=None,
     interp=None,
     iso=None,
+    pad=None,
     pv=None,
     pi=None,
     speeeeed=None,
@@ -44,107 +61,117 @@ def aladin(
     Based on Ourselin et al., "Reconstructing a 3D structure from serial
     histological sections" Image and Vision Computing, 2001
     """
-    usage_string = "reg_aladin -ref <filename> -flo <filename> [OPTIONS]"
+    # usage_string = "reg_aladin -ref <filename> -flo <filename> [OPTIONS]"
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        tmp_folder += path.sep
-        cmd_str = "reg_aladin "
+        cmd_str = "reg_aladin"
 
-        write_nifti(f"{tmp_folder}ref", ref)
-        write_nifti(f"{tmp_folder}flo", flo)
+        write_nifti(path.join(tmp_folder, "ref"), ref)
+        write_nifti(path.join(tmp_folder, "flo"), flo)
 
-        cmd_str += f"-ref {tmp_folder}ref.nii -flo {tmp_folder}flo.nii "
+        cmd_str += (
+            " -ref "
+            + path.join(tmp_folder, "ref.nii")
+            + " -flo "
+            + path.join(tmp_folder, "flo.nii")
+        )
 
         opts_str = ""
 
         if res is None:
-            res = tmp_folder + "res.nii"
-        if aff is None:
-            aff = tmp_folder + "aff.txt"
+            opts_str += " -res " + path.join(tmp_folder, "res.nii")
 
-        opts_str += f"-res {res} "
-        opts_str += f"-aff {aff} "
+        if aff is None:
+            opts_str += " -aff " + path.join(tmp_folder, "aff.txt")
 
         if noSym is True:
-            opts_str += "-noSym "
+            opts_str += " -noSym"
 
         if rigOnly is True:
-            opts_str += "-rigOnly "
+            opts_str += " -rigOnly"
 
         if affDirect is True:
-            opts_str += "-affDirect "
+            opts_str += " -affDirect"
 
         if inaff is not None:
-            write_txt(f"{tmp_folder}inaff.txt", inaff)
-            opts_str += f"-inaff {tmp_folder}inaff.txt "
+            write_txt(path.join(tmp_folder, "inaff.txt"), inaff)
+            opts_str += " -inaff " + path.join(tmp_folder, "inaff.txt")
 
         if rmask is not None:
-            write_nifti(f"{tmp_folder}rmask.nii", rmask)
-            opts_str += f"-rmask {tmp_folder}rmask.nii "
+            write_nifti(path.join(tmp_folder, "rmask.nii"), rmask)
+            opts_str += " -rmask " + path.join(tmp_folder, "rmask.nii")
 
         if fmask is not None:
-            write_nifti(f"{tmp_folder}fmask.nii", fmask)
-            opts_str += f"-fmask {tmp_folder}fmask.nii "
+            write_nifti(path.join(tmp_folder, "fmask.nii"), fmask)
+            opts_str += " -fmask " + path.join(tmp_folder, "fmask.nii")
 
         if maxit is not None:
-            opts_str += f"-maxit {maxit} "
+            opts_str += f" -maxit {maxit}"
 
         if ln is not None:
-            opts_str += f"-ln {ln} "
+            opts_str += f" -ln {ln}"
 
         if lp is not None:
-            opts_str += f"-lp {lp} "
+            opts_str += f" -lp {lp}"
 
         if smooR is not None:
-            opts_str += f"-smooR {smooR} "
+            opts_str += f" -smooR {smooR}"
 
         if smooF is not None:
-            opts_str += f"-smooF {smooF} "
+            opts_str += f" -smooF {smooF}"
 
         if refLowThr is not None:
-            opts_str += f"-refLowThr {refLowThr} "
+            opts_str += f" -refLowThr {refLowThr}"
 
         if refUpThr is not None:
-            opts_str += f"-refUpThr {refUpThr} "
+            opts_str += f" -refUpThr {refUpThr}"
 
         if floLowThr is not None:
-            opts_str += f"-floLowThr {floLowThr} "
+            opts_str += f" -floLowThr {floLowThr}"
 
         if floUpThr is not None:
-            opts_str += f"-floUpThr {floUpThr} "
+            opts_str += f" -floUpThr {floUpThr}"
 
         if nac is True:
-            opts_str += "-nac "
+            opts_str += " -nac"
 
         if cog is True:
-            opts_str += "-cog "
+            opts_str += " -cog"
 
         if interp is True:
-            opts_str += "-interp "
+            opts_str += " -interp"
 
         if iso is True:
-            opts_str += "-iso "
+            opts_str += " -iso"
+
+        if pad is not None:
+            opts_str += f" -pad {int(pad)}"
 
         if pv is not None:
-            opts_str += f"-pv {pv} "
+            opts_str += f" -pv {pv}"
 
         if pi is not None:
-            opts_str += f"-pi {pi} "
+            opts_str += f" -pi {pi}"
 
         if speeeeed is True:
-            opts_str += "-speeeeed "
+            opts_str += " -speeeeed"
 
         if omp is not None:
-            opts_str += f"-omp {omp} "
+            opts_str += f" -omp {omp}"
 
-        cmd_str += opts_str + "  "
+        if not verbose:
+            opts_str += " -voff"
+
+        cmd_str += opts_str
 
         if verbose:
             print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
-            return read_txt(aff), read_nifti(res)
+            return read_nifti(path.join(tmp_folder, "res.nii")), read_txt(
+                path.join(tmp_folder, "aff.txt")
+            )
         else:
             return None
 
@@ -206,168 +233,175 @@ def f3d(
     Jacobian determinant log.
     """
 
-    usage_string = "reg_f3d -ref <filename> -flo <filename> [OPTIONS]"
+    # usage_string = "reg_f3d -ref <filename> -flo <filename> [OPTIONS]"
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        tmp_folder += path.sep
-        cmd_str = "reg_f3d "
+        cmd_str = "reg_f3d"
 
-        write_nifti(f"{tmp_folder}ref", ref)
-        write_nifti(f"{tmp_folder}flo", flo)
+        write_nifti(path.join(tmp_folder, "ref"), ref)
+        write_nifti(path.join(tmp_folder, "flo"), flo)
 
-        cmd_str += f"-ref {tmp_folder}ref.nii -flo {tmp_folder}flo.nii "
+        cmd_str += (
+            " -ref "
+            + path.join(tmp_folder, "ref.nii")
+            + " -flo "
+            + path.join(tmp_folder, "flo.nii")
+        )
 
         opts_str = ""
 
         if res is None:
-            res = tmp_folder + "res.nii"
+            res = path.join(tmp_folder, "res.nii")
         if cpp is None:
-            cpp = tmp_folder + "cpp.nii"
+            cpp = path.join(tmp_folder, "cpp.nii")
 
-        opts_str += f"-res {res} "
-        opts_str += f"-cpp {cpp} "
+        opts_str += f" -res {res}"
+        opts_str += f" -cpp {cpp}"
 
         if aff is not None:
-            write_txt(f"{tmp_folder}aff.txt", aff)
-            opts_str += f"-aff {tmp_folder}aff.txt "
+            write_txt(path.join(tmp_folder, "aff.txt"), aff)
+            opts_str += " -aff " + path.join(tmp_folder, "aff.txt")
 
         if incpp is not None:
-            opts_str += f"-incpp {incpp} "
+            opts_str += f" -incpp {incpp}"
 
         if rmask is not None:
-            write_nifti(f"{tmp_folder}rmask.nii", rmask)
-            opts_str += f"-rmask {tmp_folder}rmask.nii "
+            write_nifti(path.join(tmp_folder, "rmask.nii"), rmask)
+            opts_str += " -rmask " + path.join(tmp_folder, "rmask.nii")
 
         if smooR is not None:
-            opts_str += f"-smooR {smooR} "
+            opts_str += f" -smooR {smooR}"
 
         if smooF is not None:
-            opts_str += f"-smooF {smooF} "
+            opts_str += f" -smooF {smooF}"
 
         if rLwTh is not None:
             if type(rLwTh) is tuple:
-                opts_str += f'-rLwTh {" ".join(str(x) for x in rLwTh)} '
+                opts_str += f" -rLwTh {' '.join(str(x) for x in rLwTh)}"
             else:
-                opts_str += f"--rLwTh {rLwTh} "
+                opts_str += f" --rLwTh {rLwTh}"
 
         if rUpTh is not None:
             if type(rUpTh) is tuple:
-                opts_str += f'-rUpTh {" ".join(str(x) for x in rUpTh)} '
+                opts_str += f" -rUpTh {' '.join(str(x) for x in rUpTh)}"
             else:
-                opts_str += f"--rUpTh {rUpTh} "
+                opts_str += f" --rUpTh {rUpTh} "
 
         if fLwTh is not None:
             if type(fLwTh) is tuple:
-                opts_str += f'-fLwTh {" ".join(str(x) for x in fLwTh)} '
+                opts_str += f" -fLwTh {' '.join(str(x) for x in fLwTh)} "
             else:
-                opts_str += f"--fLwTh {fLwTh} "
+                opts_str += f" --fLwTh {fLwTh} "
 
         if fUpTh is not None:
             if type(fUpTh) is tuple:
-                opts_str += f'-fUpTh {" ".join(str(x) for x in fUpTh)} '
+                opts_str += f" -fUpTh {' '.join(str(x) for x in fUpTh)} "
             else:
-                opts_str += f"--fUpTh {fUpTh} "
+                opts_str += f" --fUpTh {fUpTh} "
 
         if sx is not None:
-            opts_str += f"-sx {sx} "
+            opts_str += f" -sx {sx}"
 
         if sy is not None:
-            opts_str += f"-sy {sy} "
+            opts_str += f" -sy {sy}"
 
         if sz is not None:
-            opts_str += f"-sz {sz} "
+            opts_str += f" -sz {sz}"
 
         if be is not None:
-            opts_str += f"-be {be} "
+            opts_str += f" -be {be}"
 
         if le is not None:
-            opts_str += f'-le {" ".join(str(x) for x in le)} '
+            opts_str += f" -le {' '.join(str(x) for x in le)}"
 
         if l2 is not None:
-            opts_str += f"-l2 {l2} "
+            opts_str += f" -l2 {l2}"
 
         if jl is not None:
-            opts_str += f"-jl {jl} "
+            opts_str += f" -jl {jl}"
 
         if noAppJL is True:
-            opts_str += "-noAppJL "
+            opts_str += " -noAppJL"
 
         if nmi is True:
-            opts_str += "--nmi "
+            opts_str += " --nmi"
 
         if rbn is not None:
             if type(rbn) is tuple:
-                opts_str += f'-rbn {" ".join(str(x) for x in rbn)} '
+                opts_str += f" -rbn {' '.join(str(x) for x in rbn)}"
             else:
-                opts_str += f"--rbn {rbn} "
+                opts_str += f" --rbn {rbn}"
 
         if fbn is not None:
             if type(fbn) is tuple:
-                opts_str += f'-fbn {" ".join(str(x) for x in fbn)} '
+                opts_str += f" -fbn {' '.join(str(x) for x in fbn)}"
             else:
-                opts_str += f"--fbn {fbn} "
+                opts_str += f" --fbn {fbn}"
 
         if lncc is not None:
             if type(lncc) is tuple:
-                opts_str += f'-lncc {" ".join(str(x) for x in lncc)} '
+                opts_str += f" -lncc {' '.join(str(x) for x in lncc)}"
             else:
-                opts_str += f"--lncc {lncc} "
+                opts_str += f" --lncc {lncc}"
 
         if ssd is not None:
             if type(ssd) is (int, float):
-                opts_str += f"-ssd {int(ssd)} "
+                opts_str += f" -ssd {int(ssd)}"
             else:
-                opts_str += "--ssd "
+                opts_str += " --ssd"
 
         if kld is not None:
             if type(kld) is (int, float):
-                opts_str += f"-kld {int(kld)} "
+                opts_str += f" -kld {int(kld)}"
             else:
-                opts_str += "--kld "
+                opts_str += " --kld"
 
         if amc is True:
-            opts_str += "-amc "
+            opts_str += " -amc"
 
         if maxit is not None:
-            opts_str += f"-maxit {int(maxit)} "
+            opts_str += f" -maxit {int(maxit)}"
 
         if ln is not None:
-            opts_str += f"-ln {int(ln)} "
+            opts_str += f" -ln {int(ln)}"
 
         if lp is not None:
-            opts_str += f"-lp {int(lp)} "
+            opts_str += f" -lp {int(lp)}"
 
         if nopy is True:
-            opts_str += "-nopy "
+            opts_str += " -nopy"
 
         if noConj is True:
-            opts_str += "-noConj "
+            opts_str += " -noConj"
 
         if pert is not None:
-            opts_str += f"-pert {int(pert)} "
+            opts_str += f" -pert {int(pert)}"
 
         if vel is True:
-            opts_str += "-vel "
+            opts_str += " -vel"
 
         if fmask is not None:
-            write_nifti(f"{tmp_folder}fmask.nii", fmask)
-            opts_str += f"-fmask {tmp_folder}fmask.nii "
+            write_nifti(path.join(tmp_folder, "fmask.nii"), fmask)
+            opts_str += " -fmask " + path.join(tmp_folder, "fmask.nii")
 
         if omp is not None:
-            opts_str += f"-lp {int(omp)} "
+            opts_str += f" -lp {int(omp)}"
 
         if mem is True:
-            opts_str += "-mem "
+            opts_str += " -mem"
 
         if gpu is True:
-            opts_str += "-gpu "
+            opts_str += " -gpu"
 
         if smoothGrad is not None:
-            opts_str += f"-smoothGrad {smoothGrad} "
+            opts_str += f" -smoothGrad {smoothGrad}"
 
         if pad is not None:
-            opts_str += f"-pad {pad} "
+            opts_str += f" -pad {pad}"
+
+        if not verbose:
+            opts_str += " -voff"
 
         cmd_str += opts_str
 
@@ -380,11 +414,7 @@ def f3d(
             return None
 
 
-def resample():
-    raise NotImplementedError
-
-
-def transform(
+def resample(
     ref,
     flo,
     trans,
@@ -404,40 +434,54 @@ def transform(
         Filename of the floating image (mandatory)
     """
 
-    usage_string = "reg_resample -ref <filename> -flo <filename> [OPTIONS]"
+    # usage_string = "reg_resample -ref <filename> -flo <filename> [OPTIONS]"
 
     cmd_str = "reg_resample "
 
     with tmp.TemporaryDirectory() as tmp_folder:
-        tmp_folder += path.sep
-        write_nifti(f"{tmp_folder}ref", ref)
-        write_nifti(f"{tmp_folder}flo", flo)
-        write_nifti(f"{tmp_folder}trans", trans)
 
-        cmd_str += f"-ref {tmp_folder}ref.nii -flo {tmp_folder}flo.nii -trans {tmp_folder}trans.nii "
+        cmd_str = "reg_resample"
+
+        write_nifti(path.join(tmp_folder, "ref.nii"), ref)
+        write_nifti(path.join(tmp_folder, "flo.nii"), flo)
+
+        cmd_str += " -ref " + path.join(tmp_folder, "ref.nii")
+        cmd_str += " -flo " + path.join(tmp_folder, "flo.nii")
+
+        if trans.shape == (4, 4):
+            write_txt(path.join(tmp_folder, "trans.txt"), trans)
+            cmd_str += " -trans " + path.join(tmp_folder, "trans.txt")
+        else:
+            write_nifti(path.join(tmp_folder, "trans.nii"), trans)
+            cmd_str += " -trans " + path.join(tmp_folder, "trans.nii")
 
         opts_str = ""
 
         if res is None:
-            res = NAME + "res.nii"
+            res = path.join(tmp_folder, "res.nii")
+
+        opts_str += " -res " + res
 
         if blank is not None:
-            write_nifti(f"{tmp_folder}blank.nii", blank)
-            opts_str += f"-blank {tmp_folder}blank.nii "
+            write_nifti(path.join(tmp_folder, "blank"), blank)
+            opts_str += " -blank " + path.join(tmp_folder, "blank")
 
-        if inter is not None:
-            opts_str += f"-inter {int(inter)} "
+        if int(inter) in range(5):
+            opts_str += f" -inter {int(inter)}"
 
         if pad is not None:
-            opts_str += f"-pad {int(pad)} "
+            opts_str += f" -pad {int(pad)}"
 
         if tensor is not None:
-            opts_str += f'-fbn {" ".join(str(x) for x in tensor)}'
+            opts_str += " -tensor"
 
-        if pad is True:
-            opts_str += "-psf "
+        if psf is True:
+            opts_str += " -psf"
 
-        cmd_str += opts_str + "  "
+        if not verbose:
+            opts_str += " -voff"
+
+        cmd_str += opts_str
 
         if verbose:
             print(cmd_str)

@@ -12,12 +12,12 @@ def seed_random_generators(seed=42):
     random.seed(seed)
 
 
-def create_random_array(shape, dtype=np.float32):
-    random_array = np.random.random_sample(shape)
+def random_array(shape, dtype=np.float32):
+    random_array = np.random.rand(*shape)
     return random_array.astype(dtype)
 
 
-def create_random_affine(dtype=np.float32):
+def random_affine(dtype=np.float32):
     phi = random_float(-np.pi, np.pi)
     aff = np.eye(4)
     aff[0, 0] = np.cos(phi)
@@ -29,7 +29,17 @@ def create_random_affine(dtype=np.float32):
     return aff.astype(dtype)
 
 
-def create_random_tuple(N):
+def random_rigid(dtype=np.float32):
+    phi = random_float(-np.pi, np.pi)
+    aff = np.eye(4)
+    aff[0, 0] = np.cos(phi)
+    aff[0, 1] = -np.sin(phi)
+    aff[1, 0] = np.sin(phi)
+    aff[1, 1] = np.cos(phi)
+    return aff.astype(dtype)
+
+
+def random_tuple(N):
     return (random_float(),) * N
 
 
@@ -37,6 +47,8 @@ def create_circle(length, c=None, r=None, dtype=np.float32):
 
     if c is None:
         c = length // 2, length // 2
+    elif c != tuple:
+        c = (c, c)
     if r is None:
         r = min(c[0], c[1], length - c[0], length - c[1])
 
@@ -50,6 +62,8 @@ def create_rect(length, c=None, h=None, w=None, dtype=np.float32):
 
     if c is None:
         c = length // 2, length // 2
+    elif c != tuple:
+        c = (c, c)
     if w is None:
         w = min(c[0], length - c[0])
     if h is None:
@@ -59,7 +73,7 @@ def create_rect(length, c=None, h=None, w=None, dtype=np.float32):
     w = int(np.floor(w))
 
     rect = np.zeros((length, length))
-    rect[c[0] - w // 2 : c[0] + w // 2, c[1] - h // 2 : c[1] + h // 2] = 1
+    rect[c[0] - w // 2 : c[0] + w // 2, c[1] - h // 2 : c[1] + h // 2] = 1.0
 
     return rect.astype(dtype)
 
@@ -102,3 +116,11 @@ def rotate(array, phi=0.0):
             array_out[new_y, new_x] = array[i, j]
 
     return array_out
+
+
+def jaccard(array1, array2):
+    array1 = np.asarray(array1).astype(bool)
+    array2 = np.asarray(array2).astype(bool)
+    intersection = np.logical_and(array1, array2)
+    union = np.logical_or(array1, array2)
+    return intersection.sum() / float(union.sum())
