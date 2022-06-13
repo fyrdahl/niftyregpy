@@ -27,6 +27,7 @@ setup(
         "niftyregpy.reg",
         "niftyregpy.tools",
         "niftyregpy.average",
+        "niftyregpy.transform",
         "niftyregpy.apps",
     ],
 )
