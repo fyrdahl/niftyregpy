@@ -133,3 +133,67 @@ class TestReg:
         input = common.random_array((self.length, self.length), np.float32)
         output = reg.tools(input, smoL=common.random_tuple(3), verbose=self.verbose)
         assert output is not None
+
+    def test_reg_smoL_tuple_input(self):
+        input = common.random_array((self.length, self.length), np.float32)
+        output = reg.tools(input, smoL=common.random_tuple(3), verbose=self.verbose)
+        assert output is not None
+
+    def test_add_float(self):
+        input = common.random_array((self.length, self.length), np.float32)
+        x = common.random_float()
+        output = reg.tools(input, add=x, verbose=self.verbose)
+        assert (output == input + x).all()
+
+    def test_add_matrix(self):
+        input = common.random_array((self.length, self.length), np.float32)
+        x = common.random_array((self.length, self.length), np.float32)
+        output = reg.tools(input, add=x, verbose=self.verbose)
+        assert (output == input + x).all()
+
+    def test_sub_float(self):
+        input = common.random_array((self.length, self.length), np.float32)
+        x = common.random_float()
+        output = reg.tools(input, sub=x, verbose=self.verbose)
+        assert (output == input - x).all()
+
+    def test_sub_matrix(self):
+        input = common.random_array((self.length, self.length), np.float32)
+        x = common.random_array((self.length, self.length), np.float32)
+        output = reg.tools(input, sub=x, verbose=self.verbose)
+        assert (output == input - x).all()
+
+    def test_mul_float(self):
+        input = common.random_array((self.length, self.length), np.float32)
+        x = common.random_float()
+        output = reg.tools(input, mul=x, verbose=self.verbose)
+        assert (output == input * x).all()
+
+    def test_mul_matrix(self):
+        input = common.random_array((self.length, self.length), np.float32)
+        x = common.random_array((self.length, self.length), np.float32)
+        output = reg.tools(input, mul=x, verbose=self.verbose)
+        assert (output == input * x).all()
+
+    def test_div_float(self):
+        input = common.random_array((self.length, self.length), np.float32) + 1
+        x = common.random_float() + 1
+        output = reg.tools(input, div=x, verbose=self.verbose)
+        assert (output == input / x).all()
+
+    def test_div_matrix(self):
+        input = common.random_array((self.length, self.length), np.float32) + 1
+        x = common.random_array((self.length, self.length), np.float32) + 1
+        output = reg.tools(input, div=x, verbose=self.verbose)
+        assert (output == input / x).all()
+
+    def test_bin(self):
+        input = common.random_array((self.length, self.length), np.float32)
+        output = reg.tools(input, bin=True, verbose=self.verbose)
+        assert (output == (input > 0).astype(np.float32)).all()
+
+    def test_thr(self):
+        input = common.random_array((self.length, self.length), np.float32)
+        thr = common.random_float()
+        output = reg.tools(input, thr=thr, verbose=self.verbose)
+        assert (output == (input >= thr).astype(np.float32)).all()
