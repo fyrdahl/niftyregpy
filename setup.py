@@ -33,9 +33,6 @@ if __name__ == "__main__":
         ],
         install_requires=REQUIRED_PACKAGES,
         license="MIT",
-        project_urls={
-            "Source": "https://github.com/ZeroIntensity/pointers.py",
-            "Documentation": "https://pointerspy.netlify.app/",
-        },
+        project_urls={"Source": "https://github.com/fyrdahl/niftyregpy"},
         package_dir={"": "src"},
     )
