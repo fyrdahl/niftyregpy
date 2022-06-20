@@ -8,7 +8,7 @@ import test_common as common
 class TestReg:
     def setup_method(self, method):
         self.matrix_size = 256
-        self.tol = 0.1
+        self.tol = 0.2
         self.non_linearity = 10
         self.verbose = True
         self.object_size = 100
