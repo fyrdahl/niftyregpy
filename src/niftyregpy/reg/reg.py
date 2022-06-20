@@ -83,11 +83,11 @@ def aladin(
             opts_str += " -inaff " + path.join(tmp_folder, "inaff.txt")
 
         if rmask is not None:
-            write_nifti(path.join(tmp_folder, "rmask.nii"), rmask)
+            write_nifti(path.join(tmp_folder, "rmask.nii"), rmask.astype(float))
             opts_str += " -rmask " + path.join(tmp_folder, "rmask.nii")
 
         if fmask is not None:
-            write_nifti(path.join(tmp_folder, "fmask.nii"), fmask)
+            write_nifti(path.join(tmp_folder, "fmask.nii"), fmask.astype(float))
             opts_str += " -fmask " + path.join(tmp_folder, "fmask.nii")
 
         if maxit is not None:
@@ -251,7 +251,7 @@ def f3d(
             opts_str += f" -incpp {incpp}"
 
         if rmask is not None:
-            write_nifti(path.join(tmp_folder, "rmask.nii"), rmask)
+            write_nifti(path.join(tmp_folder, "rmask.nii"), rmask.astype(float))
             opts_str += " -rmask " + path.join(tmp_folder, "rmask.nii")
 
         if smooR is not None:
@@ -366,7 +366,7 @@ def f3d(
             opts_str += " -vel"
 
         if fmask is not None:
-            write_nifti(path.join(tmp_folder, "fmask.nii"), fmask)
+            write_nifti(path.join(tmp_folder, "fmask.nii"), fmask.astype(float))
             opts_str += " -fmask " + path.join(tmp_folder, "fmask.nii")
 
         if omp is not None:
