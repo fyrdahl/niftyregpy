@@ -50,7 +50,9 @@ class TestReg:
         flo = common.create_circle(
             self.matrix_size, r=self.object_size // 2, c=self.matrix_size // 2 + 16
         )
-        rmask = common.create_square(self.matrix_size, size=self.object_size * 1.1)
+        rmask = common.create_square(
+            self.matrix_size, size=self.object_size * 1.1, dtype=bool
+        )
         output = reg.aladin(
             ref, flo, pad=0, rmask=rmask, rigOnly=True, verbose=self.verbose
         )
@@ -61,14 +63,16 @@ class TestReg:
         flo = common.create_circle(
             self.matrix_size, r=self.object_size // 2, c=self.matrix_size // 2 + 16
         )
-        fmask = common.create_square(self.matrix_size, size=self.object_size * 1.1)
+        fmask = common.create_square(
+            self.matrix_size, size=self.object_size * 1.1, dtype=bool
+        )
         output = reg.aladin(
             ref, flo, pad=0, fmask=fmask, rigOnly=True, verbose=self.verbose
         )
         assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_f3d_nmi(self):
-        ref = ref = common.create_square(self.matrix_size, size=self.object_size)
+        ref = common.create_square(self.matrix_size, size=self.object_size)
         flo = common.apply_swirl(
             ref, self.matrix_size // 2, self.non_linearity, self.object_size
         )
@@ -76,7 +80,7 @@ class TestReg:
         assert 1 - common.dice(ref, output[0]) < 1
 
     def test_f3d_lncc(self):
-        ref = ref = common.create_square(self.matrix_size, size=self.object_size)
+        ref = common.create_square(self.matrix_size, size=self.object_size)
         flo = common.apply_swirl(
             ref, self.matrix_size // 2, self.non_linearity, self.object_size
         )
@@ -84,7 +88,7 @@ class TestReg:
         assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_f3d_ssd(self):
-        ref = ref = common.create_square(self.matrix_size, size=self.object_size)
+        ref = common.create_square(self.matrix_size, size=self.object_size)
         flo = common.apply_swirl(
             ref, self.matrix_size // 2, self.non_linearity, self.object_size
         )
@@ -92,12 +96,34 @@ class TestReg:
         assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_f3d_kld(self):
-        ref = ref = common.create_square(self.matrix_size, size=self.object_size)
+        ref = common.create_square(self.matrix_size, size=self.object_size)
         flo = common.apply_swirl(
             ref, self.matrix_size // 2, self.non_linearity, self.object_size
         )
         output = reg.f3d(ref, flo, pad=0, kld=True, verbose=self.verbose)
         assert 1 - common.dice(ref, output[0]) < self.tol
+
+    def test_f3d_rmask(self):
+        ref = common.create_square(self.matrix_size, size=self.object_size)
+        flo = common.apply_swirl(
+            ref, self.matrix_size // 2, self.non_linearity, self.object_size
+        )
+        rmask = common.create_circle(
+            self.matrix_size, r=self.object_size * 1.2, dtype=bool
+        )
+        output = reg.f3d(ref, flo, pad=0, rmask=rmask, verbose=self.verbose)
+        assert 1 - common.dice(ref, output[0]) < 1
+
+    def test_f3d_fmask(self):
+        ref = common.create_square(self.matrix_size, size=self.object_size)
+        flo = common.apply_swirl(
+            ref, self.matrix_size // 2, self.non_linearity, self.object_size
+        )
+        fmask = common.create_circle(
+            self.matrix_size, r=self.object_size * 1.2, dtype=bool
+        )
+        output = reg.f3d(ref, flo, pad=0, fmask=fmask, verbose=self.verbose)
+        assert 1 - common.dice(ref, output[0]) < 1
 
     def test_reg_float(self):
         input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
