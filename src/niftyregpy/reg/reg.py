@@ -248,7 +248,8 @@ def f3d(
             opts_str += " -aff " + path.join(tmp_folder, "aff.txt")
 
         if incpp is not None:
-            opts_str += f" -incpp {incpp}"
+            write_nifti(path.join(tmp_folder, "incpp.nii"), incpp)
+            opts_str += " -incpp " + path.join(tmp_folder, "incpp.nii")
 
         if rmask is not None:
             write_nifti(path.join(tmp_folder, "rmask.nii"), rmask.astype(float))
