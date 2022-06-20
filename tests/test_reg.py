@@ -7,193 +7,207 @@ import test_common as common
 
 class TestReg:
     def setup_method(self, method):
-        self.length = 256
-        self.tol = 0.2
+        self.matrix_size = 256
+        self.tol = 0.1
         self.non_linearity = 10
         self.verbose = True
-        self.size = common.random_float(self.length / 8, self.length * 7 / 8)
+        self.object_size = 100
         common.seed_random_generators()
 
     def test_resample_affine(self):
-        ref = common.create_rect(self.length, w=self.size, h=self.size)
-        flo = common.create_rect(self.length, w=self.size, h=self.size)
+        ref = common.create_square(self.matrix_size, size=self.object_size)
+        flo = ref = common.create_square(self.matrix_size, size=self.object_size)
         affine = common.random_rigid()
         output = reg.resample(ref, flo, trans=affine, inter=0, verbose=self.verbose)
         assert output is not None
 
-    def test_aladin_default(self):
-        ref = common.create_rect(self.length, w=self.size, h=self.size)
-        tform_trans = transform.AffineTransform(translation=-self.length // 2)
-        tform_rot = transform.AffineTransform(rotation=45, shear=10)
-        flo = transform.warp(ref, tform_trans + tform_rot + tform_trans.inverse)
+    def test_aladin(self):
+        ref = common.create_square(self.matrix_size, size=self.object_size)
+        flo = common.rotate_array(ref, angle=45)
+        flo = common.shear_array(flo, angle=10)
         output = reg.aladin(ref, flo, pad=0, verbose=self.verbose)
-        assert 1 - common.jaccard(ref, output[0]) < self.tol
+        assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_aladin_rigonly(self):
-        ref = common.create_circle(self.length, r=self.size // 2)
+        ref = common.create_circle(self.matrix_size, r=self.object_size // 2)
         flo = common.create_circle(
-            self.length, r=self.size // 2, c=self.length // 2 + 16
+            self.matrix_size, r=self.object_size // 2, c=self.matrix_size // 2 + 16
         )
         output = reg.aladin(ref, flo, pad=0, rigOnly=True, verbose=self.verbose)
-        assert 1 - common.jaccard(ref, output[0]) < self.tol
+        assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_aladin_inaff(self):
-        ref = common.create_circle(self.length, r=self.size // 2)
+        ref = common.create_circle(self.matrix_size, r=self.object_size // 2)
         flo = common.create_circle(
-            self.length, r=self.size // 2, c=self.length // 2 + 16
+            self.matrix_size, r=self.object_size // 2, c=self.matrix_size // 2 + 16
         )
         _, aff = reg.aladin(ref, flo, verbose=True)
         output = reg.aladin(ref, flo, pad=0, inaff=aff, verbose=self.verbose)
-        assert 1 - common.jaccard(ref, output[0]) < self.tol
+        assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_aladin_rmask(self):
-        ref = common.create_circle(self.length, r=self.size // 2)
+        ref = common.create_circle(self.matrix_size, r=self.object_size // 2)
         flo = common.create_circle(
-            self.length, r=self.size // 2, c=self.length // 2 + 16
+            self.matrix_size, r=self.object_size // 2, c=self.matrix_size // 2 + 16
         )
-        rmask = common.create_rect(self.length, w=self.size, h=self.size)
+        rmask = common.create_square(self.matrix_size, size=self.object_size * 1.1)
         output = reg.aladin(
             ref, flo, pad=0, rmask=rmask, rigOnly=True, verbose=self.verbose
         )
-        assert 1 - common.jaccard(ref, output[0]) < self.tol
+        assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_aladin_fmask(self):
-        ref = common.create_circle(self.length, r=self.size // 2)
+        ref = common.create_circle(self.matrix_size, r=self.object_size // 2)
         flo = common.create_circle(
-            self.length, r=self.size // 2, c=self.length // 2 + 16
+            self.matrix_size, r=self.object_size // 2, c=self.matrix_size // 2 + 16
         )
-        fmask = common.create_rect(
-            self.length, c=self.length // 2 + 16, w=self.size, h=self.size
-        )
+        fmask = common.create_square(self.matrix_size, size=self.object_size * 1.1)
         output = reg.aladin(
             ref, flo, pad=0, fmask=fmask, rigOnly=True, verbose=self.verbose
         )
-        assert 1 - common.jaccard(ref, output[0]) < self.tol
+        assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_f3d_nmi(self):
-        ref = common.create_rect(self.length, w=self.size, h=self.size)
-        flo = common.apply_swirl(ref, self.length // 2, self.non_linearity, self.size)
+        ref = ref = common.create_square(self.matrix_size, size=self.object_size)
+        flo = common.apply_swirl(
+            ref, self.matrix_size // 2, self.non_linearity, self.object_size
+        )
         output = reg.f3d(ref, flo, pad=0, nmi=True, rbn=2, fbn=2, verbose=self.verbose)
-        assert 1 - common.jaccard(ref, output[0]) < 1
+        assert 1 - common.dice(ref, output[0]) < 1
 
     def test_f3d_lncc(self):
-        ref = common.create_rect(self.length, w=self.size, h=self.size)
-        flo = common.apply_swirl(ref, self.length // 2, self.non_linearity, self.size)
+        ref = ref = common.create_square(self.matrix_size, size=self.object_size)
+        flo = common.apply_swirl(
+            ref, self.matrix_size // 2, self.non_linearity, self.object_size
+        )
         output = reg.f3d(ref, flo, pad=0, lncc=3, verbose=self.verbose)
-        assert 1 - common.jaccard(ref, output[0]) < self.tol
+        assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_f3d_ssd(self):
-        ref = common.create_rect(self.length, w=self.size, h=self.size)
-        flo = common.apply_swirl(ref, self.length // 2, self.non_linearity, self.size)
+        ref = ref = common.create_square(self.matrix_size, size=self.object_size)
+        flo = common.apply_swirl(
+            ref, self.matrix_size // 2, self.non_linearity, self.object_size
+        )
         output = reg.f3d(ref, flo, pad=0, ssd=True, verbose=self.verbose)
-        assert 1 - common.jaccard(ref, output[0]) < self.tol
+        assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_f3d_kld(self):
-        ref = common.create_rect(self.length, w=self.size, h=self.size)
-        flo = common.apply_swirl(ref, self.length // 2, self.non_linearity, self.size)
+        ref = ref = common.create_square(self.matrix_size, size=self.object_size)
+        flo = common.apply_swirl(
+            ref, self.matrix_size // 2, self.non_linearity, self.object_size
+        )
         output = reg.f3d(ref, flo, pad=0, kld=True, verbose=self.verbose)
-        assert 1 - common.jaccard(ref, output[0]) < self.tol
+        assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_reg_float(self):
-        input = common.random_array((self.length, self.length), np.float32)
+        input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
         output = reg.tools(input, float=True, verbose=self.verbose)
         assert output is not None
 
     def test_reg_down(self):
-        input = common.random_array((self.length, self.length), np.float32)
+        input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
         output = reg.tools(input, down=True, verbose=self.verbose)
         assert output.shape == tuple(x // 2 for x in input.shape)
 
     def test_reg_smoS_scalar_input(self):
-        input = common.random_array((self.length, self.length), np.float32)
+        input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
         output = reg.tools(input, smoS=common.random_float(), verbose=self.verbose)
         assert output is not None
 
     def test_reg_smoS_tuple_input(self):
-        input = common.random_array((self.length, self.length), np.float32)
+        input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
         output = reg.tools(input, smoS=common.random_tuple(3), verbose=self.verbose)
         assert output is not None
 
     def test_reg_smoG_scalar_input(self):
-        input = common.random_array((self.length, self.length), np.float32)
+        input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
         output = reg.tools(input, smoG=common.random_float(), verbose=self.verbose)
         assert output is not None
 
     def test_reg_smoG_tuple_input(self):
-        input = common.random_array((self.length, self.length), np.float32)
+        input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
         output = reg.tools(input, smoG=common.random_tuple(3), verbose=self.verbose)
         assert output is not None
 
     def test_reg_smoL_scalar_input(self):
-        input = common.random_array((self.length, self.length), np.float32)
+        input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
         output = reg.tools(input, smoL=common.random_float(), verbose=self.verbose)
         assert output is not None
 
     def test_reg_smoL_tuple_input(self):
-        input = common.random_array((self.length, self.length), np.float32)
+        input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
         output = reg.tools(input, smoL=common.random_tuple(3), verbose=self.verbose)
         assert output is not None
 
     def test_reg_smoL_tuple_input(self):
-        input = common.random_array((self.length, self.length), np.float32)
+        input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
         output = reg.tools(input, smoL=common.random_tuple(3), verbose=self.verbose)
         assert output is not None
 
     def test_add_float(self):
-        input = common.random_array((self.length, self.length), np.float32)
+        input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
         x = common.random_float()
         output = reg.tools(input, add=x, verbose=self.verbose)
         assert (output == input + x).all()
 
     def test_add_matrix(self):
-        input = common.random_array((self.length, self.length), np.float32)
-        x = common.random_array((self.length, self.length), np.float32)
+        input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
+        x = common.random_array((self.matrix_size, self.matrix_size), np.float32)
         output = reg.tools(input, add=x, verbose=self.verbose)
         assert (output == input + x).all()
 
     def test_sub_float(self):
-        input = common.random_array((self.length, self.length), np.float32)
+        input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
         x = common.random_float()
         output = reg.tools(input, sub=x, verbose=self.verbose)
         assert (output == input - x).all()
 
     def test_sub_matrix(self):
-        input = common.random_array((self.length, self.length), np.float32)
-        x = common.random_array((self.length, self.length), np.float32)
+        input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
+        x = common.random_array((self.matrix_size, self.matrix_size), np.float32)
         output = reg.tools(input, sub=x, verbose=self.verbose)
         assert (output == input - x).all()
 
     def test_mul_float(self):
-        input = common.random_array((self.length, self.length), np.float32)
+        input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
         x = common.random_float()
         output = reg.tools(input, mul=x, verbose=self.verbose)
         assert (output == input * x).all()
 
     def test_mul_matrix(self):
-        input = common.random_array((self.length, self.length), np.float32)
-        x = common.random_array((self.length, self.length), np.float32)
+        input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
+        x = common.random_array((self.matrix_size, self.matrix_size), np.float32)
         output = reg.tools(input, mul=x, verbose=self.verbose)
         assert (output == input * x).all()
 
     def test_div_float(self):
-        input = common.random_array((self.length, self.length), np.float32) + 1
+        input = (
+            common.random_array((self.matrix_size, self.matrix_size), np.float32) + 1
+        )
         x = common.random_float() + 1
         output = reg.tools(input, div=x, verbose=self.verbose)
         assert (output == input / x).all()
 
     def test_div_matrix(self):
-        input = common.random_array((self.length, self.length), np.float32) + 1
-        x = common.random_array((self.length, self.length), np.float32) + 1
+        input = (
+            common.random_array((self.matrix_size, self.matrix_size), np.float32) + 1
+        )
+        x = common.random_array((self.matrix_size, self.matrix_size), np.float32) + 1
         output = reg.tools(input, div=x, verbose=self.verbose)
         assert (output == input / x).all()
 
+    def test_rms(self):
+        input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
+        output = reg.tools(input, rms=input, verbose=self.verbose)
+        assert output == 0
+
     def test_bin(self):
-        input = common.random_array((self.length, self.length), np.float32)
+        input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
         output = reg.tools(input, bin=True, verbose=self.verbose)
         assert (output == (input > 0).astype(np.float32)).all()
 
     def test_thr(self):
-        input = common.random_array((self.length, self.length), np.float32)
+        input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
         thr = common.random_float()
         output = reg.tools(input, thr=thr, verbose=self.verbose)
         assert (output == (input >= thr).astype(np.float32)).all()

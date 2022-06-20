@@ -59,19 +59,17 @@ def create_circle(length, c=None, r=None, dtype=np.float32):
     return circ.astype(dtype)
 
 
-def create_rect(length, c=None, h=None, w=None, dtype=np.float32):
+def create_square(length, c=None, size=None, dtype=np.float32):
 
     if c is None:
         c = length // 2, length // 2
     elif c != tuple:
         c = (c, c)
-    if w is None:
-        w = min(c[0], length - c[0])
-    if h is None:
-        h = min(c[1], length - c[1])
+    if size != tuple:
+        size = (size, size)
 
-    h = int(np.floor(h))
-    w = int(np.floor(w))
+    h = int(np.floor(size[0]))
+    w = int(np.floor(size[1]))
 
     rect = np.zeros((length, length))
     rect[c[0] - w // 2 : c[0] + w // 2, c[1] - h // 2 : c[1] + h // 2] = 1.0
@@ -84,11 +82,18 @@ def add_noise(array, mean=0, std=0.1):
 
 
 def jaccard(array1, array2):
-    array1 = np.asarray(array1).astype(bool)
-    array2 = np.asarray(array2).astype(bool)
+    array1 = array1.astype(bool)
+    array2 = array2.astype(bool)
     intersection = np.logical_and(array1, array2)
     union = np.logical_or(array1, array2)
     return intersection.sum() / float(union.sum())
+
+
+def dice(array1, array2):
+    array1 = array1.astype(bool)
+    array2 = array2.astype(bool)
+    intersection = np.logical_and(array1, array2)
+    return 2.0 * intersection.sum() / (array1.sum() + array2.sum())
 
 
 def apply_swirl(array, c, s, r):
@@ -100,3 +105,17 @@ def apply_swirl(array, c, s, r):
         strength=s,
         radius=r,
     )
+
+
+def rotate_array(array, angle):
+    angle_rad = np.deg2rad(angle)
+    tform_trans = transform.AffineTransform(translation=-array.shape[0] // 2)
+    tform_rot = transform.AffineTransform(rotation=angle_rad)
+    return transform.warp(array, tform_trans + tform_rot + tform_trans.inverse)
+
+
+def shear_array(array, angle):
+    angle_rad = np.deg2rad(angle)
+    tform_trans = transform.AffineTransform(translation=-array.shape[0] // 2)
+    tform_rot = transform.AffineTransform(shear=angle_rad)
+    return transform.warp(array, tform_trans + tform_rot + tform_trans.inverse)

@@ -1,26 +1,10 @@
+import builtins
 import tempfile as tmp
 from os import path
 
 import numpy as np
 
 from ..average import avg, avg_lts, avg_tran, demean1, demean2, demean3
-from ..tools import (
-    add,
-    bin,
-    div,
-    down,
-    float,
-    iso,
-    mul,
-    nan,
-    noscl,
-    rms,
-    smoG,
-    smoL,
-    smoS,
-    sub,
-    thr,
-)
 from ..utils import call_niftyreg, read_nifti, read_txt, write_nifti, write_txt
 
 
@@ -522,87 +506,143 @@ def tools(
     with tmp.TemporaryDirectory() as tmp_folder:
 
         write_nifti(path.join(tmp_folder, "in.nii"), input)
-        opts_str = " -in " + path.join(tmp_folder, "in.nii")
+        cmd_str += " -in " + path.join(tmp_folder, "in.nii")
 
         if out is None:
             out = path.join(tmp_folder, "out.nii")
 
-        opts_str += " -out " + out
+        cmd_str += " -out " + out
 
         if float is not None:
-            opts_str += " -float"
+            cmd_str += " -float"
+            if call_niftyreg(cmd_str, verbose):
+                return read_nifti(out)
+            else:
+                return None
 
         if down is not None:
-            opts_str += " -down"
+            cmd_str += " -down"
+            if call_niftyreg(cmd_str, verbose):
+                return read_nifti(out)
+            else:
+                return None
 
         if smoS is not None:
             smoS = ((smoS,) * 3) if np.isscalar(smoS) else smoS
-            opts_str += f' -smoS {" ".join(str(x) for x in smoS)}'
+            cmd_str += f' -smoS {" ".join(str(x) for x in smoS)}'
+            if call_niftyreg(cmd_str, verbose):
+                return read_nifti(out)
+            else:
+                return None
 
         if smoG is not None:
             smoG = ((smoG,) * 3) if np.isscalar(smoG) else smoG
-            opts_str += f' -smoG {" ".join(str(x) for x in smoG)}'
+            cmd_str += f' -smoG {" ".join(str(x) for x in smoG)}'
+            if call_niftyreg(cmd_str, verbose):
+                return read_nifti(out)
+            else:
+                return None
 
         if smoL is not None:
             smoL = ((smoL,) * 3) if np.isscalar(smoL) else smoL
-            opts_str += f' -smoL {" ".join(str(x) for x in smoL)}'
+            cmd_str += f' -smoL {" ".join(str(x) for x in smoL)}'
+            if call_niftyreg(cmd_str, verbose):
+                return read_nifti(out)
+            else:
+                return None
 
         if add is not None:
             if isinstance(add, np.ndarray):
-                write_nifti(path.join(tmp_folder, "add"), add)
-                opts_str += " -add " + path.join(tmp_folder, "add")
+                write_nifti(path.join(tmp_folder, "add.nii"), add)
+                cmd_str += " -add " + path.join(tmp_folder, "add.nii")
             else:
-                opts_str += f" -add {add}"
+                cmd_str += f" -add {add}"
+            if call_niftyreg(cmd_str, verbose):
+                return read_nifti(out)
+            else:
+                return None
 
         if sub is not None:
             if isinstance(sub, np.ndarray):
-                write_nifti(path.join(tmp_folder, "sub"), sub)
-                opts_str += " -sub " + path.join(tmp_folder, "sub")
+                write_nifti(path.join(tmp_folder, "sub.nii"), sub)
+                cmd_str += " -sub " + path.join(tmp_folder, "sub.nii")
             else:
-                opts_str += f" -sub {sub}"
+                cmd_str += f" -sub {sub}"
+            if call_niftyreg(cmd_str, verbose):
+                return read_nifti(out)
+            else:
+                return None
 
         if mul is not None:
             if isinstance(mul, np.ndarray):
-                write_nifti(path.join(tmp_folder, "mul"), mul)
-                opts_str += " -mul " + path.join(tmp_folder, "mul")
+                write_nifti(path.join(tmp_folder, "mul.nii"), mul)
+                cmd_str += " -mul " + path.join(tmp_folder, "mul.nii")
             else:
-                opts_str += f" -mul {mul}"
+                cmd_str += f" -mul {mul}"
+            if call_niftyreg(cmd_str, verbose):
+                return read_nifti(out)
+            else:
+                return None
 
         if div is not None:
             if isinstance(div, np.ndarray):
-                write_nifti(path.join(tmp_folder, "div"), div)
-                opts_str += " -div " + path.join(tmp_folder, "div")
+                write_nifti(path.join(tmp_folder, "div.nii"), div)
+                cmd_str += " -div " + path.join(tmp_folder, "div.nii")
             else:
-                opts_str += f" -div {div}"
+                cmd_str += f" -div {div}"
+            if call_niftyreg(cmd_str, verbose):
+                return read_nifti(out)
+            else:
+                return None
+
+        if rms is not None:
+            write_nifti(path.join(tmp_folder, "rms.nii"), rms)
+            cmd_str += " -rms " + path.join(tmp_folder, "rms.nii")
+            out = call_niftyreg(cmd_str, verbose=verbose, output_stdout=True)
+            return None if not out else builtins.float(out)
 
         if bin is not None:
-            opts_str += " -bin"
+            cmd_str += " -bin"
+            if call_niftyreg(cmd_str, verbose):
+                return read_nifti(out)
+            else:
+                return None
 
         if thr is not None:
-            opts_str += f" -thr {thr}"
+            cmd_str += f" -thr {thr}"
+            if call_niftyreg(cmd_str, verbose):
+                return read_nifti(out)
+            else:
+                return None
 
         if nan is not None:
             if isinstance(nan, np.ndarray):
-                write_nifti(path.join(tmp_folder, "nan"), nan)
-                opts_str += " -nan " + path.join(tmp_folder, "nan")
+                write_nifti(path.join(tmp_folder, "nan.nii"), nan)
+                cmd_str += " -nan " + path.join(tmp_folder, "nan.nii")
             else:
-                opts_str += f" -nan {nan}"
+                cmd_str += f" -nan {nan}"
+            if call_niftyreg(cmd_str, verbose):
+                return read_nifti(out)
+            else:
+                return None
 
         if iso is not None:
-            opts_str += " -iso"
+            cmd_str += " -iso"
+            if call_niftyreg(cmd_str, verbose):
+                return read_nifti(out)
+            else:
+                return None
 
         if noscl is not None:
-            opts_str += " -noscl"
+            cmd_str += " -noscl"
+            if call_niftyreg(cmd_str, verbose):
+                return read_nifti(out)
+            else:
+                return None
 
         if version is not None:
-            opts_str += " --version"
-
-        cmd_str += opts_str
-
-        if verbose:
-            print(cmd_str)
-
-        if call_niftyreg(cmd_str, verbose):
-            return read_nifti(out)
-        else:
-            return None
+            cmd_str += " --version"
+            if call_niftyreg(cmd_str, verbose):
+                return read_nifti(out)
+            else:
+                return None

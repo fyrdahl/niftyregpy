@@ -17,7 +17,12 @@ def read_nifti(name: str) -> np.array:
 def write_nifti(name, array, __affine=None) -> bool:
 
     try:
-        nib.save(nib.Nifti1Image(np.atleast_3d(array), affine=__affine), name)
+        nib.save(
+            nib.Nifti1Image(
+                np.atleast_3d(np.ascontiguousarray(array)), affine=__affine
+            ),
+            name,
+        )
         return True
     except Exception as e:
         raise e
