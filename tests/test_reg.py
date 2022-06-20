@@ -77,7 +77,7 @@ class TestReg:
             ref, self.matrix_size // 2, self.non_linearity, self.object_size
         )
         output = reg.f3d(ref, flo, pad=0, nmi=True, rbn=2, fbn=2, verbose=self.verbose)
-        assert 1 - common.dice(ref, output[0]) < 1
+        assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_f3d_lncc(self):
         ref = common.create_square(self.matrix_size, size=self.object_size)
@@ -112,7 +112,7 @@ class TestReg:
             self.matrix_size, r=self.object_size * 1.2, dtype=bool
         )
         output = reg.f3d(ref, flo, pad=0, rmask=rmask, verbose=self.verbose)
-        assert 1 - common.dice(ref, output[0]) < 1
+        assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_f3d_fmask(self):
         ref = common.create_square(self.matrix_size, size=self.object_size)
@@ -123,7 +123,7 @@ class TestReg:
             self.matrix_size, r=self.object_size * 1.2, dtype=bool
         )
         output = reg.f3d(ref, flo, pad=0, fmask=fmask, verbose=self.verbose)
-        assert 1 - common.dice(ref, output[0]) < 1
+        assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_reg_float(self):
         input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
