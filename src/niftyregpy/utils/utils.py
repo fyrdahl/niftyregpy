@@ -9,7 +9,7 @@ def read_nifti(name: str) -> np.array:
 
     try:
         array = np.array(nib.load(name).dataobj)
-        return array
+        return np.ascontiguousarray(array)
     except FileNotFoundError:
         return None
 
