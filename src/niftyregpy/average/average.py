@@ -222,3 +222,40 @@ def demean3(ref, aff, tran, flo, verbose=False):
             return read_nifti(os.path.join(tmp_folder, "output.nii"))
         else:
             return None
+
+
+def demean_noaff(ref, aff, flo, verbose=False):
+
+    """
+    Same as the demean expect that the specified affine is removed from the
+    non-linear (euclidean) transformation.
+    """
+
+    with tmp.TemporaryDirectory() as tmp_folder:
+
+        cmd_str = "reg_average "
+        cmd_str += os.path.join(tmp_folder, "output.nii") + " -demean_noaff "
+
+        write_nifti(os.path.join(tmp_folder, "ref.nii"), ref)
+        cmd_str += os.path.join(tmp_folder, "ref.nii") + " "
+
+        for i, x in enumerate(zip(aff, tran, flo)):
+            write_txt(os.path.join(tmp_folder, f"avg_aff_{i}.txt"), x[0])
+            write_nifti(os.path.join(tmp_folder, f"avg_tran_{i}.nii"), x[1])
+            write_nifti(os.path.join(tmp_folder, f"avg_flo_{i}.nii"), x[2])
+            cmd_str += (
+                os.path.join(tmp_folder, f"avg_aff_{i}.txt")
+                + " "
+                + os.path.join(tmp_folder, f"avg_tran_{i}.nii")
+                + " "
+                + os.path.join(tmp_folder, f"avg_flo_{i}.nii")
+                + " "
+            )
+
+        if verbose:
+            print(cmd_str)
+
+        if call_niftyreg(cmd_str, verbose):
+            return read_nifti(os.path.join(tmp_folder, "output.nii"))
+        else:
+            return None

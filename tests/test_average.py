@@ -75,3 +75,16 @@ class TestAverage:
             ref, (aff1, aff2), (flo1, flo2), (tran1, tran2), verbose=True
         )
         assert output is not None
+
+    def test_demean_noaff(self):
+        ref = common.random_array((self.matrix_size, self.matrix_size))
+        aff1 = common.random_affine()
+        aff2 = common.random_affine()
+        flo1 = common.random_array((self.matrix_size, self.matrix_size))
+        flo2 = common.random_array((self.matrix_size, self.matrix_size))
+        tran1 = common.random_array((self.matrix_size, self.matrix_size))
+        tran2 = common.random_array((self.matrix_size, self.matrix_size))
+        output = average.demean3(
+            ref, (aff1, aff2), (flo1, flo2), (tran1, tran2), verbose=True
+        )
+        assert output is not None
