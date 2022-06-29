@@ -161,11 +161,6 @@ class TestReg:
         output = reg.tools(input, smoL=common.random_tuple(3), verbose=self.verbose)
         assert output is not None
 
-    def test_reg_smoL_tuple_input(self):
-        input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
-        output = reg.tools(input, smoL=common.random_tuple(3), verbose=self.verbose)
-        assert output is not None
-
     def test_add_float(self):
         input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
         x = common.random_float()
