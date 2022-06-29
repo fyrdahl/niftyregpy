@@ -25,7 +25,7 @@ class TestReg:
         ref = common.create_square(self.matrix_size, size=self.object_size)
         flo = common.rotate_array(ref, angle=45)
         flo = common.shear_array(flo, angle=10)
-        output = reg.aladin(ref, flo, pad=0, verbose=self.verbose)
+        output = reg.aladin(ref, flo, verbose=self.verbose)
         assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_aladin_rigonly(self):
@@ -33,7 +33,7 @@ class TestReg:
         flo = common.create_circle(
             self.matrix_size, r=self.object_size // 2, c=self.matrix_size // 2 + 16
         )
-        output = reg.aladin(ref, flo, pad=0, rigOnly=True, verbose=self.verbose)
+        output = reg.aladin(ref, flo, rigOnly=True, verbose=self.verbose)
         assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_aladin_inaff(self):
@@ -42,7 +42,7 @@ class TestReg:
             self.matrix_size, r=self.object_size // 2, c=self.matrix_size // 2 + 16
         )
         _, aff = reg.aladin(ref, flo, verbose=True)
-        output = reg.aladin(ref, flo, pad=0, inaff=aff, verbose=self.verbose)
+        output = reg.aladin(ref, flo, inaff=aff, verbose=self.verbose)
         assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_aladin_rmask(self):
@@ -53,9 +53,7 @@ class TestReg:
         rmask = common.create_square(
             self.matrix_size, size=self.object_size * 1.1, dtype=bool
         )
-        output = reg.aladin(
-            ref, flo, pad=0, rmask=rmask, rigOnly=True, verbose=self.verbose
-        )
+        output = reg.aladin(ref, flo, rmask=rmask, rigOnly=True, verbose=self.verbose)
         assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_aladin_fmask(self):
@@ -66,9 +64,7 @@ class TestReg:
         fmask = common.create_square(
             self.matrix_size, size=self.object_size * 1.1, dtype=bool
         )
-        output = reg.aladin(
-            ref, flo, pad=0, fmask=fmask, rigOnly=True, verbose=self.verbose
-        )
+        output = reg.aladin(ref, flo, fmask=fmask, rigOnly=True, verbose=self.verbose)
         assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_f3d_nmi(self):
@@ -76,7 +72,7 @@ class TestReg:
         flo = common.apply_swirl(
             ref, self.matrix_size // 2, self.non_linearity, self.object_size
         )
-        output = reg.f3d(ref, flo, pad=0, nmi=True, rbn=2, fbn=2, verbose=self.verbose)
+        output = reg.f3d(ref, flo, nmi=True, rbn=2, fbn=2, verbose=self.verbose)
         assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_f3d_lncc(self):
@@ -84,7 +80,7 @@ class TestReg:
         flo = common.apply_swirl(
             ref, self.matrix_size // 2, self.non_linearity, self.object_size
         )
-        output = reg.f3d(ref, flo, pad=0, lncc=3, verbose=self.verbose)
+        output = reg.f3d(ref, flo, lncc=3, verbose=self.verbose)
         assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_f3d_ssd(self):
@@ -92,7 +88,7 @@ class TestReg:
         flo = common.apply_swirl(
             ref, self.matrix_size // 2, self.non_linearity, self.object_size
         )
-        output = reg.f3d(ref, flo, pad=0, ssd=True, verbose=self.verbose)
+        output = reg.f3d(ref, flo, ssd=True, verbose=self.verbose)
         assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_f3d_kld(self):
@@ -100,7 +96,7 @@ class TestReg:
         flo = common.apply_swirl(
             ref, self.matrix_size // 2, self.non_linearity, self.object_size
         )
-        output = reg.f3d(ref, flo, pad=0, kld=True, verbose=self.verbose)
+        output = reg.f3d(ref, flo, kld=True, verbose=self.verbose)
         assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_f3d_rmask(self):
@@ -111,7 +107,7 @@ class TestReg:
         rmask = common.create_circle(
             self.matrix_size, r=self.object_size * 1.2, dtype=bool
         )
-        output = reg.f3d(ref, flo, pad=0, rmask=rmask, verbose=self.verbose)
+        output = reg.f3d(ref, flo, rmask=rmask, verbose=self.verbose)
         assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_f3d_fmask(self):
@@ -122,7 +118,7 @@ class TestReg:
         fmask = common.create_circle(
             self.matrix_size, r=self.object_size * 1.2, dtype=bool
         )
-        output = reg.f3d(ref, flo, pad=0, fmask=fmask, verbose=self.verbose)
+        output = reg.f3d(ref, flo, fmask=fmask, verbose=self.verbose)
         assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_reg_float(self):

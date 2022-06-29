@@ -8,8 +8,12 @@ import numpy as np
 def read_nifti(name: str) -> np.array:
 
     try:
-        array = np.array(nib.load(name).dataobj)
-        return np.ascontiguousarray(array)
+        array = np.ascontiguousarray(nib.load(name).dataobj)
+        if any_nans(array):
+            return np.nan_to_num(array, nan=0.0)
+        else:
+            return array
+
     except FileNotFoundError:
         return None
 
@@ -77,3 +81,16 @@ def get_help_string(tool: str) -> str:
         return stdout
 
     return None
+
+
+def _any_nans(a):
+    for x in a:
+        if np.isnan(x):
+            return True
+    return False
+
+
+def any_nans(a):
+    if not a.dtype.kind == "f":
+        return False
+    return _any_nans(a.flat)
