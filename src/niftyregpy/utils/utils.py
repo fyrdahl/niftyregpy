@@ -81,14 +81,14 @@ def get_help_string(tool: str) -> str:
     return None
 
 
-def _any_nans(a):
+def _any_nans(a) -> bool:
     for x in a:
         if np.isnan(x):
             return True
     return False
 
 
-def any_nans(a):
+def any_nans(a) -> bool:
     if not a.dtype.kind == "f":
         return False
     return _any_nans(a.flat)
