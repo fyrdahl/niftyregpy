@@ -22,9 +22,7 @@ def write_nifti(name, array, __affine=None) -> bool:
 
     try:
         nib.save(
-            nib.Nifti1Image(
-                np.atleast_3d(np.ascontiguousarray(array)), affine=__affine
-            ),
+            nib.Nifti1Image(np.ascontiguousarray(array), affine=__affine),
             name,
         )
         return True
