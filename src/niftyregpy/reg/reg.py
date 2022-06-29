@@ -1,4 +1,5 @@
 import builtins
+import shlex
 import tempfile as tmp
 from os import path
 
@@ -37,6 +38,7 @@ def aladin(
     pi=None,
     speeeeed=None,
     omp=None,
+    user_opts=None,
     verbose=False,
 ):
 
@@ -144,6 +146,10 @@ def aladin(
         if omp is not None:
             opts_str += f" -omp {omp}"
 
+        if user_opts is not None:
+            for x in shlex.split(user_opts):
+                opts_str += f" {x}"
+
         if not verbose:
             opts_str += " -voff"
 
@@ -202,6 +208,7 @@ def f3d(
     gpu=None,
     smoothGrad=None,
     pad=None,
+    user_opts=None,
     verbose=False,
 ):
 
@@ -384,6 +391,10 @@ def f3d(
 
         if pad is not None:
             opts_str += f" -pad {pad}"
+
+        if user_opts is not None:
+            for x in shlex.split(user_opts):
+                opts_str += f" {x}"
 
         if not verbose:
             opts_str += " -voff"

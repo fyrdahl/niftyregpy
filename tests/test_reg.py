@@ -67,6 +67,12 @@ class TestReg:
         output = reg.aladin(ref, flo, fmask=fmask, rigOnly=True, verbose=self.verbose)
         assert 1 - common.dice(ref, output[0]) < self.tol
 
+    def test_aladin_user_opts(self):
+        ref = common.create_square(self.matrix_size, size=self.object_size)
+        flo = common.rotate_array(ref, angle=45)
+        output = reg.aladin(ref, flo, user_opts="-voff", verbose=self.verbose)
+        assert 1 - common.dice(ref, output[0]) < self.tol
+
     def test_f3d_nmi(self):
         ref = common.create_square(self.matrix_size, size=self.object_size)
         flo = common.apply_swirl(
@@ -119,6 +125,14 @@ class TestReg:
             self.matrix_size, r=self.object_size * 1.2, dtype=bool
         )
         output = reg.f3d(ref, flo, fmask=fmask, verbose=self.verbose)
+        assert 1 - common.dice(ref, output[0]) < self.tol
+
+    def test_f3d_user_opts(self):
+        ref = common.create_square(self.matrix_size, size=self.object_size)
+        flo = common.apply_swirl(
+            ref, self.matrix_size // 2, self.non_linearity, self.object_size
+        )
+        output = reg.f3d(ref, flo, user_opts="-voff", verbose=self.verbose)
         assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_reg_float(self):
