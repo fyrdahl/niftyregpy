@@ -3,9 +3,14 @@ niftyregpy
 
 .. image:: https://github.com/fyrdahl/niftyregpy/actions/workflows/pytest.yml/badge.svg
         :target: https://github.com/fyrdahl/niftyregpy/actions/workflows/pytest.yml
+        :alt: Build Status
 
 .. image:: https://readthedocs.org/projects/niftyregpy/badge/?version=latest
         :target: https://niftyregpy.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
+
+.. image:: https://codecov.io/gh/fyrdahl/niftyregpy/branch/main/graph/badge.svg
+        :target: https://codecov.io/gh/fyrdahl/niftyregpy
+        :alt: Coverage
 
 Python Wrapper for `NiftyReg <http://cmictig.cs.ucl.ac.uk/wiki/index.php/NiftyReg>`_
