@@ -1,3 +1,5 @@
+.. include:: ../README.rst
+
 .. toctree::
     :hidden:
     :caption: User Guide
