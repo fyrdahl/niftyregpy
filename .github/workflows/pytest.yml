@@ -1,4 +1,4 @@
-# .github/workflows/pytest.yaml
+# .github/workflows/pytest.yml
 name: PyTest
 on:
   push:
@@ -6,28 +6,32 @@ on:
       - main
     paths-ignore:
       - "**/README.rst"
+      - "**/.readthedocs.yml"
       - "docs/**/*"
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.platform }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        platform:
+          - ubuntu-latest
+          - macos-latest
         python-version: ["3.7", "3.8", "3.9", "3.10"]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install tox tox-gh-actions
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install --upgrade coverage[toml] tox tox-gh-actions
 
       - name: Clone NiftyReg
         uses: actions/checkout@v3
