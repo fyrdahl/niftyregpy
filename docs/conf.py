@@ -8,6 +8,7 @@ project = "niftyregpy"
 extensions = ["sphinx.ext.autodoc", "sphinxcontrib.bibtex"]
 autosummary_generate = True
 autosummary_imported_members = True
+bibtex_bibfiles = ["refs.bib"]
 
 source_suffix = ".rst"
 master_doc = "index"
