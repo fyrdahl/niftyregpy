@@ -55,7 +55,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: tox-gh-actions-coverage
-          path: ./coverage.xml
+          path: coverage.xml
           if-no-files-found: error
 
       - name: Upload coverage.xml to codecov
