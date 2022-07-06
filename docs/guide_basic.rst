@@ -11,7 +11,7 @@ If you're using NiftyReg in your research, please cite the appropritate publicat
 The rigid and affine registration are performed using an algorithm initially presented by Ourselin et al.[1]. The symmetric versions of the rigid and affine registration have been presented in Modat et al.[2].
 The non-linear registration is based on the work is based on the work initially presented by Rueckert et al.[3]. The current implementation has been presented in Modat et al.[4].
 
-For more information about the NiftyReg package, please refer to `the official GitHub repo <https://docs-cupy.chainer.org/en/latest/index.html>`_, or `the NiftyReg website <http://cmictig.cs.ucl.ac.uk/wiki/index.php/NiftyReg>`_.
+For more information about the NiftyReg package, please refer to `the official GitHub repo <https://github.com/KCL-BMEIS/niftyreg>`_, or `the NiftyReg website <http://cmictig.cs.ucl.ac.uk/wiki/index.php/NiftyReg>`_.
 
 References
 -----------
