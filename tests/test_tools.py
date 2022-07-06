@@ -121,3 +121,19 @@ class TestTools:
         thr = common.random_float()
         output = tools.thr(input, thr, verbose=True)
         assert (output == (input >= thr).astype(np.float32)).all()
+
+    def test_nan(self):
+        input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
+        mask = common.create_circle(self.matrix_size, r=self.matrix_size // 4)
+        output = tools.nan(input, mask, verbose=True)
+        assert output is not None
+
+    def test_noslc(self):
+        input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
+        output = tools.noscl(input, verbose=True)
+        assert output is not None
+
+    def test_iso(self):
+        input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
+        output = tools.iso(input, verbose=True)
+        assert output is not None
