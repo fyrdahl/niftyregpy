@@ -1,5 +1,5 @@
 niftyregpy
-=====
+==========
 
 .. image:: https://github.com/fyrdahl/niftyregpy/actions/workflows/pytest.yml/badge.svg
         :target: https://github.com/fyrdahl/niftyregpy/actions/workflows/pytest.yml

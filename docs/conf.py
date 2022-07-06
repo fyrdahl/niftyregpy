@@ -12,7 +12,7 @@ bibtex_bibfiles = ["refs.bib"]
 
 source_suffix = ".rst"
 master_doc = "index"
-language = None
+language = "en"
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 pygments_style = "sphinx"
 html_theme = "sphinx_rtd_theme"
