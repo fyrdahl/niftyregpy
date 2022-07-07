@@ -4,7 +4,7 @@ from os import path
 
 import numpy as np
 
-from ..utils import call_niftyreg, read_nifti, write_nifti
+from ..utils import call_niftyreg, is_function_available, read_nifti, write_nifti
 
 
 def float(input, output=None, verbose=False):
@@ -27,7 +27,8 @@ def float(input, output=None, verbose=False):
 
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output)
-        return None
+
+    return None
 
 
 def down(input, output=None, verbose=False):
@@ -50,7 +51,8 @@ def down(input, output=None, verbose=False):
 
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output)
-        return None
+
+    return None
 
 
 def smoS(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
@@ -74,7 +76,7 @@ def smoS(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output)
 
-        return None
+    return None
 
 
 def smoG(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
@@ -99,7 +101,7 @@ def smoG(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output)
 
-        return None
+    return None
 
 
 def smoL(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
@@ -124,7 +126,7 @@ def smoL(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output)
 
-        return None
+    return None
 
 
 def add(input, x, output=None, verbose=False):
@@ -154,7 +156,7 @@ def add(input, x, output=None, verbose=False):
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output)
 
-        return None
+    return None
 
 
 def sub(input, x, output=None, verbose=False):
@@ -184,7 +186,7 @@ def sub(input, x, output=None, verbose=False):
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output)
 
-        return None
+    return None
 
 
 def mul(input, x, output=None, verbose=False):
@@ -214,7 +216,7 @@ def mul(input, x, output=None, verbose=False):
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output)
 
-        return None
+    return None
 
 
 def div(input, x, output=None, verbose=False):
@@ -244,7 +246,7 @@ def div(input, x, output=None, verbose=False):
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output)
 
-        return None
+    return None
 
 
 def rms(input, x, output=None, verbose=False):
@@ -273,7 +275,7 @@ def rms(input, x, output=None, verbose=False):
         if out:
             return builtins.float(out)
 
-        return None
+    return None
 
 
 def bin(input, output=None, verbose=False):
@@ -298,7 +300,7 @@ def bin(input, output=None, verbose=False):
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output)
 
-        return None
+    return None
 
 
 def thr(input, thr, output=None, verbose=False):
@@ -349,7 +351,7 @@ def nan(input, x, output=None, verbose=False):
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output, output_nan=True)
 
-        return None
+    return None
 
 
 def iso(input, output=None, verbose=False):
@@ -374,7 +376,7 @@ def iso(input, output=None, verbose=False):
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output)
 
-        return None
+    return None
 
 
 def noscl(input, output=None, verbose=False):
@@ -399,4 +401,31 @@ def noscl(input, output=None, verbose=False):
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output)
 
-        return None
+    return None
+
+
+def chgres(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
+
+    """
+    Resample the input image to the specified resolution (in mm)
+    """
+    cmd_str = "reg_tools"
+
+    if not is_function_available(cmd_str, "chgres"):
+        raise NotImplementedError
+
+    with tmp.TemporaryDirectory() as tmp_folder:
+
+        write_nifti(path.join(tmp_folder, "input.nii"), input)
+        cmd_str += " -in " + path.join(tmp_folder, "input.nii")
+
+        if output is None:
+            output = path.join(tmp_folder, "output.nii")
+
+        cmd_str += " -out " + output
+        cmd_str += f" -chgres {sx} {sy} {sz} "
+
+        if call_niftyreg(cmd_str, verbose):
+            return read_nifti(output)
+
+    return None

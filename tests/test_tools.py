@@ -137,3 +137,19 @@ class TestTools:
         input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
         output = tools.iso(input, verbose=True)
         assert output is not None
+
+    def test_chgres(self):
+        input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
+        size_x = common.random_float()
+        size_y = common.random_float()
+        output = tools.chgres(
+            input,
+            sx=size_x,
+            sy=size_y,
+            sz=1,
+            verbose=True,
+        )
+        assert output.shape == (
+            -(-self.matrix_size // size_x),
+            -(-self.matrix_size // size_y),
+        )
