@@ -1,2 +1,9 @@
-from .utils import read_nifti, write_nifti, read_txt, write_txt, \
-                   call_niftyreg, get_help_string
+from .utils import (
+    call_niftyreg,
+    get_help_string,
+    is_function_available,
+    read_nifti,
+    read_txt,
+    write_nifti,
+    write_txt,
+)

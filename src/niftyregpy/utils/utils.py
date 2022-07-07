@@ -72,12 +72,31 @@ def call_niftyreg(cmd_str: str, verbose=False, output_stdout=False) -> bool:
 
 def get_help_string(tool: str) -> str:
 
-    cmd_str = f"{tool} --help"
+    cmd_str = f"{tool} -h"
 
-    p = sp.Popen(shlex.split(cmd_str), stdout=sp.PIPE, stderr=sp.PIPE)
-    stdout, _ = p.communicate()
+    try:
+        p = sp.Popen(shlex.split(cmd_str), stdout=sp.PIPE, stderr=sp.PIPE)
+        stdout, stderr = p.communicate()
 
-    if stdout:
-        return stdout
+        if stdout and not stderr:
+            return stdout.decode(encoding="utf-8")
 
-    return None
+    except FileNotFoundError:
+        return None
+
+
+def is_function_available(tool: str, name: str) -> bool:
+
+    cmd_str = f"{tool} -h"
+
+    try:
+        p = sp.Popen(shlex.split(cmd_str), stdout=sp.PIPE, stderr=sp.PIPE)
+        stdout, stderr = p.communicate()
+
+        if stderr or "-" + name not in stdout.decode(encoding="utf-8"):
+            raise FileNotFoundError
+
+        return True
+
+    except FileNotFoundError:
+        return False
