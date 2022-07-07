@@ -29,9 +29,6 @@ def _avg_txt(input, verbose=False):
             write_txt(os.path.join(tmp_folder, f"avg_{i}.txt"), x)
             cmd_str += os.path.join(tmp_folder, f"avg_{i}.txt") + " "
 
-        if verbose:
-            print(cmd_str)
-
         if call_niftyreg(cmd_str, verbose):
             return read_txt(os.path.join(tmp_folder, "output.txt"))
         else:
@@ -48,9 +45,6 @@ def _avg_nii(input, verbose=False):
         for i, x in enumerate(input):
             write_nifti(os.path.join(tmp_folder, f"avg_{i}.nii"), x)
             cmd_str += os.path.join(tmp_folder, f"avg_{i}.nii") + " "
-
-        if verbose:
-            print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(os.path.join(tmp_folder, "output.nii"))
@@ -75,9 +69,6 @@ def avg_lts(aff, verbose=False):
         for i, x in enumerate(aff):
             write_txt(os.path.join(tmp_folder, f"avg_{i}.txt"), x)
             cmd_str += os.path.join(tmp_folder, f"avg_{i}.txt") + " "
-
-        if verbose:
-            print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
             return read_txt(os.path.join(tmp_folder, "output.txt"))
@@ -113,9 +104,6 @@ def avg_tran(ref, tran, flo, verbose=False):
                 + os.path.join(tmp_folder, f"avg_flo_{i}.nii")
                 + " "
             )
-
-        if verbose:
-            print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(os.path.join(tmp_folder, "output.nii"))
@@ -154,9 +142,6 @@ def demean1(ref, aff, flo, verbose=False):
                 + " "
             )
 
-        if verbose:
-            print(cmd_str)
-
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(os.path.join(tmp_folder, "output.nii"))
         else:
@@ -182,9 +167,6 @@ def demean2(ref, tran, flo, verbose=False):
                 + os.path.join(tmp_folder, f"avg_flo_{i}.nii")
                 + " "
             )
-
-        if verbose:
-            print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(os.path.join(tmp_folder, "output.nii"))
@@ -214,9 +196,6 @@ def demean3(ref, aff, tran, flo, verbose=False):
                 + os.path.join(tmp_folder, f"avg_flo_{i}.nii")
                 + " "
             )
-
-        if verbose:
-            print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(os.path.join(tmp_folder, "output.nii"))
@@ -251,9 +230,6 @@ def demean_noaff(ref, aff, flo, verbose=False):
                 + os.path.join(tmp_folder, f"avg_flo_{i}.nii")
                 + " "
             )
-
-        if verbose:
-            print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(os.path.join(tmp_folder, "output.nii"))

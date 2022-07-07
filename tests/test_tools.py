@@ -126,9 +126,9 @@ class TestTools:
         input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
         mask = common.create_circle(self.matrix_size, r=self.matrix_size // 4)
         output = tools.nan(input, mask, verbose=True)
-        assert output is not None
+        assert np.isnan(output[mask == 0]).all()
 
-    def test_noslc(self):
+    def test_noscl(self):
         input = common.random_array((self.matrix_size, self.matrix_size), np.float32)
         output = tools.noscl(input, verbose=True)
         assert output is not None

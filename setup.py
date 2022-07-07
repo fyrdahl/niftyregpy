@@ -10,7 +10,6 @@ if __name__ == "__main__":
         author="fyrdahl",
         author_email="fyrdahl@med.umich.edu",
         description="Python interface for NiftyReg",
-        long_description_content_type="text/markdown",
         packages=[
             "niftyregpy",
             "niftyregpy.average",

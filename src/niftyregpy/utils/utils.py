@@ -1,15 +1,16 @@
 import shlex
+import signal
 import subprocess as sp
 
 import nibabel as nib
 import numpy as np
 
 
-def read_nifti(name: str) -> np.array:
+def read_nifti(name: str, output_nan=False) -> np.array:
 
     try:
         array = np.ascontiguousarray(nib.load(name).dataobj)
-        if any_nans(array):
+        if any_nans(array) and not output_nan:
             return np.nan_to_num(array, nan=0.0)
         else:
             return array
@@ -54,12 +55,13 @@ def call_niftyreg(cmd_str: str, verbose=False, output_stdout=False) -> bool:
     stdout, stderr = p.communicate()
 
     if verbose:
+        print(cmd_str)
         for line in stdout.decode(encoding="utf-8").split("\n"):
             print(line)
         for line in stderr.decode(encoding="utf-8").split("\n"):
             print(line)
 
-    if stderr:
+    if stderr or p.returncode == -signal.SIGSEGV:
         return False
 
     if output_stdout:

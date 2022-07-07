@@ -25,9 +25,6 @@ def float(input, output=None, verbose=False):
 
         write_nifti(path.join(tmp_folder, "input.nii"), input)
 
-        if verbose:
-            print(cmd_str)
-
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output)
         return None
@@ -51,9 +48,6 @@ def down(input, output=None, verbose=False):
 
         write_nifti(path.join(tmp_folder, "input.nii"), input)
 
-        if verbose:
-            print(cmd_str)
-
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output)
         return None
@@ -76,9 +70,6 @@ def smoS(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
 
         cmd_str += " -out " + output
         cmd_str += f" -smoS {sx} {sy} {sz} "
-
-        if verbose:
-            print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output)
@@ -105,9 +96,6 @@ def smoG(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
         cmd_str += " -out " + output
         cmd_str += f" -smoG {sx} {sy} {sz} "
 
-        if verbose:
-            print(cmd_str)
-
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output)
 
@@ -132,9 +120,6 @@ def smoL(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
 
         cmd_str += " -out " + output
         cmd_str += f" -smoL {sx} {sy} {sz} "
-
-        if verbose:
-            print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output)
@@ -166,9 +151,6 @@ def add(input, x, output=None, verbose=False):
             write_nifti(path.join(tmp_folder, "x.nii"), x)
             cmd_str += " -add " + path.join(tmp_folder, "x.nii")
 
-        if verbose:
-            print(cmd_str)
-
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output)
 
@@ -199,9 +181,6 @@ def sub(input, x, output=None, verbose=False):
             write_nifti(path.join(tmp_folder, "x.nii"), x)
             cmd_str += " -sub " + path.join(tmp_folder, "x.nii")
 
-        if verbose:
-            print(cmd_str)
-
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output)
 
@@ -231,9 +210,6 @@ def mul(input, x, output=None, verbose=False):
         else:
             write_nifti(path.join(tmp_folder, "x.nii"), x)
             cmd_str += " -mul " + path.join(tmp_folder, "x.nii")
-
-        if verbose:
-            print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output)
@@ -292,9 +268,6 @@ def rms(input, x, output=None, verbose=False):
         cmd_str += " -out " + output
         cmd_str += " -rms " + path.join(tmp_folder, "x.nii")
 
-        if verbose:
-            print(cmd_str)
-
         out = call_niftyreg(cmd_str, verbose, output_stdout=True)
 
         if out:
@@ -347,9 +320,6 @@ def thr(input, thr, output=None, verbose=False):
         cmd_str += " -out " + path.join(tmp_folder, "output.nii")
         cmd_str += f" -thr {thr}"
 
-        if verbose:
-            print(cmd_str)
-
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output)
 
@@ -376,11 +346,8 @@ def nan(input, x, output=None, verbose=False):
         cmd_str += " -out " + path.join(tmp_folder, "output.nii")
         cmd_str += " -nan " + path.join(tmp_folder, "x.nii")
 
-        if verbose:
-            print(cmd_str)
-
         if call_niftyreg(cmd_str, verbose):
-            return read_nifti(output)
+            return read_nifti(output, output_nan=True)
 
         return None
 
@@ -403,9 +370,6 @@ def iso(input, output=None, verbose=False):
 
         cmd_str += " -out " + path.join(tmp_folder, "output.nii")
         cmd_str += " -iso"
-
-        if verbose:
-            print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output)
@@ -431,9 +395,6 @@ def noscl(input, output=None, verbose=False):
 
         cmd_str += " -out " + path.join(tmp_folder, "output.nii")
         cmd_str += " -noscl"
-
-        if verbose:
-            print(cmd_str)
 
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output)

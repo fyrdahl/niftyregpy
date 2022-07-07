@@ -155,9 +155,6 @@ def aladin(
 
         cmd_str += opts_str
 
-        if verbose:
-            print(cmd_str)
-
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(path.join(tmp_folder, "res.nii")), read_txt(
                 path.join(tmp_folder, "aff.txt")
@@ -401,9 +398,6 @@ def f3d(
 
         cmd_str += opts_str
 
-        if verbose:
-            print(cmd_str)
-
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(res), read_nifti(cpp)
         else:
@@ -479,9 +473,6 @@ def resample(
 
         cmd_str += opts_str
 
-        if verbose:
-            print(cmd_str)
-
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(res)
         else:
@@ -514,7 +505,7 @@ def tools(
     verbose=False,
 ):
 
-    cmd_str = "reg_tools "
+    cmd_str = "reg_tools"
     with tmp.TemporaryDirectory() as tmp_folder:
 
         write_nifti(path.join(tmp_folder, "in.nii"), input)
@@ -628,13 +619,10 @@ def tools(
                 return None
 
         if nan is not None:
-            if isinstance(nan, np.ndarray):
-                write_nifti(path.join(tmp_folder, "nan.nii"), nan)
-                cmd_str += " -nan " + path.join(tmp_folder, "nan.nii")
-            else:
-                cmd_str += f" -nan {nan}"
+            write_nifti(path.join(tmp_folder, "nan.nii"), nan)
+            cmd_str += " -nan " + path.join(tmp_folder, "nan.nii")
             if call_niftyreg(cmd_str, verbose):
-                return read_nifti(out)
+                return read_nifti(out, output_nan=True)
             else:
                 return None
 
