@@ -10,7 +10,7 @@ def read_nifti(name: str, output_nan=False) -> np.array:
 
     try:
         array = np.ascontiguousarray(nib.load(name).dataobj)
-        if any_nans(array) and not output_nan:
+        if not output_nan and any_nans(array):
             return np.nan_to_num(array, nan=0.0)
         else:
             return array
