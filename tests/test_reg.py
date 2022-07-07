@@ -33,7 +33,7 @@ class TestReg:
         flo = common.create_circle(
             self.matrix_size, r=self.object_size // 2, c=self.matrix_size // 2 + 16
         )
-        output = reg.aladin(ref, flo, rigOnly=True, verbose=self.verbose)
+        output = reg.aladin(ref, flo, rigOnly=True, maxit=10, verbose=self.verbose)
         assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_aladin_inaff(self):

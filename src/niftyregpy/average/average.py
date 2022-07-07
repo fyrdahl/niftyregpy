@@ -203,7 +203,7 @@ def demean3(ref, aff, tran, flo, verbose=False):
             return None
 
 
-def demean_noaff(ref, aff, flo, verbose=False):
+def demean_noaff(ref, aff, tran, flo, verbose=False):
 
     """
     Same as the demean expect that the specified affine is removed from the
