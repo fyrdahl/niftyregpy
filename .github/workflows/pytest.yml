@@ -1,5 +1,5 @@
 # .github/workflows/pytest.yml
-name: PyTest
+name: pytest
 on:
   push:
     branches:
