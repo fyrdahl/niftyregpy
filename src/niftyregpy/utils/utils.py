@@ -15,7 +15,7 @@ def read_nifti(name: str, output_nan=False) -> np.array:
         else:
             return array
 
-    except FileNotFoundError:
+    except OSError:
         return None
 
 
@@ -36,7 +36,7 @@ def read_txt(name: str):
     try:
         array = np.loadtxt(name)
         return array
-    except FileNotFoundError:
+    except OSError:
         return None
 
 
