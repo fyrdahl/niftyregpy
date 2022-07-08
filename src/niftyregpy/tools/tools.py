@@ -412,7 +412,7 @@ def chgres(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
     cmd_str = "reg_tools"
 
     if not is_function_available(cmd_str, "chgres"):
-        return NotImplemented
+        return NotImplemented  # pragma: no cover
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
@@ -440,7 +440,7 @@ def rmNanInf(input, output=None, x=0.0, verbose=False):
     cmd_str = "reg_tools"
 
     if not is_function_available(cmd_str, "rmNanInf"):
-        return NotImplemented
+        return NotImplemented  # pragma: no cover
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
@@ -468,7 +468,7 @@ def testActiveBlocks(input, output=None, verbose=False):
     cmd_str = "reg_tools"
 
     if not is_function_available(cmd_str, "testActiveBlocks"):
-        return NotImplemented
+        return NotImplemented  # pragma: no cover
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
