@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 from niftyregpy import tools
 
 import test_common as common
@@ -149,7 +150,20 @@ class TestTools:
             sz=1,
             verbose=True,
         )
-        assert output.shape == (
+        assert output is NotImplemented or output.shape == (
             -(-self.matrix_size // size_x),
             -(-self.matrix_size // size_y),
         )
+
+    def test_rmNanInf(self):
+        input = np.zeros((self.matrix_size, self.matrix_size), np.float32)
+        input[128, 128] = np.nan
+        input[185, 185] = np.inf
+        output = tools.rmNanInf(input, x=0.0, verbose=True)
+        assert output is NotImplemented or (output == 0.0).all()
+
+    def test_testActiveBlocks(self):
+        input = common.create_square(self.matrix_size, size=self.matrix_size // 4)
+        input = common.add_noise(input)
+        output = tools.testActiveBlocks(input, verbose=True)
+        assert output is NotImplemented or output is not None

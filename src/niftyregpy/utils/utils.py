@@ -93,7 +93,7 @@ def is_function_available(tool: str, name: str) -> bool:
         p = sp.Popen(shlex.split(cmd_str), stdout=sp.PIPE, stderr=sp.PIPE)
         stdout, stderr = p.communicate()
 
-        if stderr or "-" + name not in stdout.decode(encoding="utf-8"):
+        if stderr or "-" + name.lower() not in stdout.decode(encoding="utf-8").lower():
             raise FileNotFoundError
 
         return True

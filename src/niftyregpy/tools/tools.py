@@ -412,7 +412,7 @@ def chgres(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
     cmd_str = "reg_tools"
 
     if not is_function_available(cmd_str, "chgres"):
-        raise NotImplementedError
+        return NotImplemented
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
@@ -423,7 +423,63 @@ def chgres(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
             output = path.join(tmp_folder, "output.nii")
 
         cmd_str += " -out " + output
-        cmd_str += f" -chgres {sx} {sy} {sz} "
+        cmd_str += f" -chgres {sx} {sy} {sz}"
+
+        if call_niftyreg(cmd_str, verbose):
+            return read_nifti(output)
+
+    return None
+
+
+def rmNanInf(input, output=None, x=0.0, verbose=False):
+
+    """
+    Remove the nan and inf from the input image and replace them by the specified value
+    """
+
+    cmd_str = "reg_tools"
+
+    if not is_function_available(cmd_str, "rmNanInf"):
+        return NotImplemented
+
+    with tmp.TemporaryDirectory() as tmp_folder:
+
+        write_nifti(path.join(tmp_folder, "input.nii"), input)
+        cmd_str += " -in " + path.join(tmp_folder, "input.nii")
+
+        if output is None:
+            output = path.join(tmp_folder, "output.nii")
+
+        cmd_str += " -out " + output
+        cmd_str += f" -rmNanInf {x}"
+
+        if call_niftyreg(cmd_str, verbose):
+            return read_nifti(output)
+
+    return None
+
+
+def testActiveBlocks(input, output=None, verbose=False):
+
+    """
+    Generate an image highlighting the active blocks for reg_aladin (block variance is shown)
+    """
+
+    cmd_str = "reg_tools"
+
+    if not is_function_available(cmd_str, "testActiveBlocks"):
+        return NotImplemented
+
+    with tmp.TemporaryDirectory() as tmp_folder:
+
+        write_nifti(path.join(tmp_folder, "input.nii"), input)
+        cmd_str += " -in " + path.join(tmp_folder, "input.nii")
+
+        if output is None:
+            output = path.join(tmp_folder, "output.nii")
+
+        cmd_str += " -out " + output
+        cmd_str += " -testActiveBlocks"
 
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output)
