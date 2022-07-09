@@ -1,0 +1,4 @@
+Functions (`niftyregpy`)
+===================
+.. automodule::
+    niftyregpy
