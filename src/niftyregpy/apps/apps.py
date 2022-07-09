@@ -51,20 +51,9 @@ def groupwise(
 
                 # Create a folder to store the result
                 if not path.exists(path.join(tmp_folder, f"aff_{cur_it+1}")):
-                    print(
-                        "Folder "
-                        + path.join(tmp_folder, f"aff_{cur_it+1}")
-                        + " does not exist, creating!"
-                    )
                     os.makedirs(path.join(tmp_folder, f"aff_{cur_it+1}"))
-                else:
-                    print(
-                        "Folder "
-                        + path.join(tmp_folder, f"aff_{cur_it+1}")
-                        + " already exist!"
-                    )
 
-                for i in range(len(input)):
+                for i, _ in enumerate(input):
 
                     # Check if the registration has already been performed
                     if not path.isfile(
@@ -86,20 +75,18 @@ def groupwise(
                             )
                             if path.isfile(prev_affine_file):
                                 aladin_args += f" -inaff {prev_affine_file}"
-                            else:
-                                print("No previous affine found, probably an error!")
                         else:
                             # Registration is forced to be rigid for the first iteration
                             aladin_args += " -rigOnly"
 
                         # Check if a mask has been specified for the reference image
                         if template_mask is not None:
-                            aladin_args += " -rmask" + path.join(
+                            aladin_args += " -rmask " + path.join(
                                 tmp_folder, "template_mask.nii"
                             )
 
                         if input_mask is not None:
-                            aladin_args += " -fmask" + path.join(
+                            aladin_args += " -fmask " + path.join(
                                 tmp_folder, f"input_mask_{i}.nii"
                             )
 
@@ -179,18 +166,7 @@ def groupwise(
             ):
                 # Create a folder to store the current results
                 if not path.exists(path.join(tmp_folder, f"nrr_{cur_it+1}")):
-                    print(
-                        "Folder "
-                        + path.join(tmp_folder, f"nrr_{cur_it+1}")
-                        + " does not exist, creating!"
-                    )
                     os.makedirs(path.join(tmp_folder, f"nrr_{cur_it+1}"))
-                else:
-                    print(
-                        "Folder "
-                        + path.join(tmp_folder, f"nrr_{cur_it+1}")
-                        + " already exist!"
-                    )
 
                 for i, _ in enumerate(input):
 
@@ -222,12 +198,12 @@ def groupwise(
 
                         # Check if a mask has been specified for the reference image
                         if template_mask is not None:
-                            f3d_args += " -rmask" + path.join(
+                            f3d_args += " -rmask " + path.join(
                                 tmp_folder, "template_mask.nii"
                             )
 
                         if input_mask is not None:
-                            f3d_args += " -rmask" + path.join(
+                            f3d_args += " -fmask " + path.join(
                                 tmp_folder, f"input_mask_{i}.nii"
                             )
 

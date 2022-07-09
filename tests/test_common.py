@@ -96,9 +96,16 @@ def dice(array1, array2):
     return 2.0 * intersection.sum() / (array1.sum() + array2.sum())
 
 
-def apply_swirl(array, c, s, r):
-    if c != tuple:
+def apply_swirl(array, c=None, s=10, r=None):
+
+    if c is None:
+        c = tuple(x // 2 for x in array.shape)
+    elif c != tuple:
         c = (c, c)
+
+    if r is None:
+        r = sum(list(array.shape)) // 4
+
     return transform.swirl(
         array,
         center=c,
