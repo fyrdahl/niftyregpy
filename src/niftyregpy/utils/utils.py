@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+"""Utility functions.
+"""
+
 import shlex
 import signal
 import subprocess as sp

@@ -11,6 +11,14 @@ def float(input, output=None, verbose=False):
 
     """
     The input image is converted to float
+
+    Args:
+        input (array): Input array to be converted
+        output (string): Specify output file (optional)
+        verbose (bool): Verbose output
+
+    Returns:
+        array: Converted input array
     """
 
     with tmp.TemporaryDirectory() as tmp_folder:

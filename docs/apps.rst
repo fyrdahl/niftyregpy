@@ -10,4 +10,4 @@ Groupwise registration
    :toctree: generated
    :nosignatures:
 
-    niftyregpy.apps.groupwise
+   niftyregpy.apps.groupwise
