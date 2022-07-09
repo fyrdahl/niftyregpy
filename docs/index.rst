@@ -8,8 +8,9 @@
 
 .. toctree::
     :hidden:
-    :caption: Core functions
-    core
+    :caption: Tools
+
+    tools
 
 .. toctree::
     :hidden:
