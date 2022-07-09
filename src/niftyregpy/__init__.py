@@ -1,1 +1,1 @@
-from . import average, reg, tools, transform
+from . import apps, average, reg, tools, transform
