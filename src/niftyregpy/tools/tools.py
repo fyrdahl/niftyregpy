@@ -10,15 +10,16 @@ from ..utils import call_niftyreg, is_function_available, read_nifti, write_nift
 def float(input, output=None, verbose=False):
 
     """
-    The input image is converted to float
+    The input image is converted to float.
 
     Args:
-        input (array): Input array to be converted
-        output (string): Specify output file (optional)
-        verbose (bool): Verbose output
+        input (array): Input array to be converted.
+        output (string): Specify output file (optional).
+        verbose (bool): Verbose output (default = False).
 
     Returns:
-        array: Converted input array
+        array: Converted input array.
+
     """
 
     with tmp.TemporaryDirectory() as tmp_folder:
@@ -42,7 +43,16 @@ def float(input, output=None, verbose=False):
 def down(input, output=None, verbose=False):
 
     """
-    The input image is downsampled 2 times
+    The input image is downsampled 2 times.
+
+    Args:
+        input (array): Input array to be converted.
+        output (string): Specify output file (optional).
+        verbose (bool): Verbose output (default = False).
+
+    Returns:
+        array: Input array downsampled 2 times.
+
     """
 
     with tmp.TemporaryDirectory() as tmp_folder:
@@ -66,7 +76,19 @@ def down(input, output=None, verbose=False):
 def smoS(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
 
     """
-    The input image is smoothed using a cubic b-spline kernel
+    The input image is smoothed using a cubic b-spline kernel.
+
+    Args:
+        input (array): Input array to be converted.
+        sx (float): Smoothing in x.
+        sy (float): Smoothing in y.
+        sz (float): Smoothing in z.
+        output (string): Specify output file (optional).
+        verbose (bool): Verbose output (default = False).
+
+    Returns:
+        array: Input array smoothed using a cubic b-spline kernel.
+
     """
     with tmp.TemporaryDirectory() as tmp_folder:
 
@@ -90,7 +112,19 @@ def smoS(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
 def smoG(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
 
     """
-    The input image is smoothed using a Gaussian kernel
+    The input image is smoothed using a Gaussian kernel.
+
+    Args:
+        input (array): Input array to be converted.
+        sx (float): Smoothing in x.
+        sy (float): Smoothing in y.
+        sz (float): Smoothing in z.
+        output (string): Specify output file (optional).
+        verbose (bool): Verbose output (default = False).
+
+    Returns:
+        array: Input array smoothed using a Gaussian kernel.
+
     """
 
     with tmp.TemporaryDirectory() as tmp_folder:
@@ -115,7 +149,19 @@ def smoG(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
 def smoL(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
 
     """
-    The input label image is smoothed using a Gaussian kernel
+    The input label image is smoothed using a Gaussian kernel.
+
+    Args:
+        input (array): Input array to be converted.
+        sx (float): Smoothing in x.
+        sy (float): Smoothing in y.
+        sz (float): Smoothing in z.
+        output (string): Specify output file (optional).
+        verbose (bool): Verbose output (default = False).
+
+    Returns:
+        array: Input label array smoothed using a Gaussian kernel.
+
     """
 
     with tmp.TemporaryDirectory() as tmp_folder:
@@ -140,7 +186,17 @@ def smoL(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
 def add(input, x, output=None, verbose=False):
 
     """
-    This image (or value) is added to the input
+    This image (or value) is added to the input.
+
+    Args:
+        input (array): Input array to be converted.
+        x (array/float): Image or value to be added to the input.
+        output (string): Specify output file (optional).
+        verbose (bool): Verbose output (default = False).
+
+    Returns:
+        array: Sum of input array and image (or value).
+
     """
 
     with tmp.TemporaryDirectory() as tmp_folder:
@@ -171,6 +227,16 @@ def sub(input, x, output=None, verbose=False):
 
     """
     This image (or value) is subtracted from the input
+
+    Args:
+        input (array): Input array to be converted.
+        x (array/float): Image or value to be subtracted from the input.
+        output (string): Specify output file (optional).
+        verbose (bool): Verbose output (default = False).
+
+    Returns:
+        array: Difference of input array and image (or value).
+
     """
 
     with tmp.TemporaryDirectory() as tmp_folder:
@@ -201,6 +267,16 @@ def mul(input, x, output=None, verbose=False):
 
     """
     This image (or value) is multiplied with the input
+
+    Args:
+        input (array): Input array to be converted.
+        x (array/float): Image or value to be multiplied with the input.
+        output (string): Specify output file (optional).
+        verbose (bool): Verbose output (default = False).
+
+    Returns:
+        array: Product of input array and image (or value).
+
     """
 
     with tmp.TemporaryDirectory() as tmp_folder:
@@ -231,6 +307,15 @@ def div(input, x, output=None, verbose=False):
 
     """
     This image (or value) is divided to the input
+    Args:
+        input (array): Input array to be converted.
+        x (array/float): Image or value to be multiplied with the input.
+        output (string): Specify output file (optional).
+        verbose (bool): Verbose output (default = False).
+
+    Returns:
+        array: Product of input array and image (or value).
+
     """
 
     with tmp.TemporaryDirectory() as tmp_folder:
