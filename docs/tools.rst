@@ -1,5 +1,5 @@
 Tools (`niftyregpy.tools`)
-======================
+==========================
 
 .. automodule::
     niftyregpy.tools
