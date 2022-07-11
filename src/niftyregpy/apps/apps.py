@@ -31,13 +31,13 @@ def groupwise(
     Arguments can be passed to both reg_aladin and reg_f3d using the
     ``affine_args`` and ``nrr_args`` arguments.
 
-    If no template image is explicitly provided, the first image in input will
-    be used to initialize the atlas.
+    If no template image is explicitly provided, the first image in ``input``
+    will be used to initialize the atlas.
 
     Args:
         input (tuple): Tuple that contains the images to create the atlas.
         template (array): Template image to use to initialize the atlas (optional).
-        input_mask (array): Verbose output (optional).
+        input_mask (tuple): Masks for the input images (optional).
         template_mask (array): Mask for the template image (optional).
         aff_it (int): Number of affine iterations to perform (default = 5).
         nrr_it (int): Number of non-rigid iterations to perform (default = 10).
