@@ -2,7 +2,7 @@ from setuptools import setup
 
 if __name__ == "__main__":
 
-    REQUIRED_PACKAGES = ["numpy", "nibabel"]
+    REQUIRED_PACKAGES = ["numpy", "nibabel", "tqdm"]
 
     setup(
         name="niftyregpy",
