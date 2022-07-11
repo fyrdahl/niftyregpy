@@ -25,13 +25,22 @@ def groupwise(
 
     Groupwise registration seeks to mitigate bias caused by a single template
     image frame. The groupwise image registration works in two parts, first
-    ``aff_it`` number of affine registrations are performed, the first is a
-    rigid registration. Second, ``nrr_it`` number of non-rigid registrations
-    are performed. After each full iteration, the transforms are averaged, and
-    used to initiliaze in the next iteration.
+    ``aff_it`` number of affine registrations (reg_aladin) are performed, the
+    first is a rigid registration. Second, ``nrr_it`` number of non-rigid
+    registrations (reg_f3d) are performed. After each full iteration, the
+    transforms are averaged, and used to initiliaze in the next iteration.
+
+    If no template image is explicitly provided, the first image in input will
+    be used to initialize the atlas.
+
+    Arguments can be passed to both reg_aladin and reg_f3d using the
+    ``affine_args`` and ``nrr_args`` arguments.
+
+    Example usage:
+        >>> avg, res = niftyregpy.apps.groupwise((input_0, input_1)
 
     Args:
-        input (tuple): Array tuple that contains the images to create the atlas.
+        input (tuple): Tuple that contains the images to create the atlas.
         template (array): Template image to use to initialize the atlas (optional).
         input_mask (array): Verbose output (optional).
         template_mask (array): Mask for the template image (optional).
