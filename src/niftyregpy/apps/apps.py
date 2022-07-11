@@ -23,9 +23,16 @@ def groupwise(
     """
     Groupwise image registration
 
+    Groupwise registration seeks to mitigate bias caused by a single template
+    image frame. The groupwise image registration works in two parts, first
+    ``aff_it`` number of affine registrations are performed, the first is a
+    rigid registration. Second, ``nrr_it`` number of non-rigid registrations
+    are performed. After each full iteration, the transforms are averaged, and
+    used to initiliaze in the next iteration.
+
     Args:
         input (array): Array that contains the images to create the atlas.
-        template (array): Template image to use to initialize the atlas creation (optional).
+        template (array): Template image to use to initialize the atlas (optional).
         input_mask (array): Verbose output (optional).
         template_mask (array): Mask for the template image (optional).
         aff_it (int): Number of affine iterations to perform (default = 5).

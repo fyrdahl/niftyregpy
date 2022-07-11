@@ -374,7 +374,7 @@ def rms(input, x, output=None, verbose=False):
 def bin(input, output=None, verbose=False):
 
     """
-    Binarise the input image (val!=0?val=1:val=0)
+    Binarize the input image (val!=0?val=1:val=0)
     """
 
     with tmp.TemporaryDirectory() as tmp_folder:

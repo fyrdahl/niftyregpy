@@ -31,8 +31,8 @@ class TestApps:
                 common.create_circle(self.matrix_size),
             ),
             template_mask=common.create_circle(self.matrix_size),
-            affine_args="-maxit 5",
-            nrr_args="-maxit 300",
+            affine_args="-maxit 5 -omp 1",
+            nrr_args="-maxit 300 -omp 1",
             verbose=False,
         )
         assert 1 - common.dice(ref, output[0]) < self.tol

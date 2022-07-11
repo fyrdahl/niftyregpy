@@ -16,11 +16,12 @@ jobs:
       matrix:
         platform:
           - ubuntu-latest
-        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11.0-beta.3"]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Setup
         uses: actions/setup-python@v4
         with:
