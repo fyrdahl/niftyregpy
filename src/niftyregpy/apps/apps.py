@@ -31,7 +31,7 @@ def groupwise(
     used to initiliaze in the next iteration.
 
     Args:
-        input (array): Array that contains the images to create the atlas.
+        input (tuple): Array tuple that contains the images to create the atlas.
         template (array): Template image to use to initialize the atlas (optional).
         input_mask (array): Verbose output (optional).
         template_mask (array): Mask for the template image (optional).

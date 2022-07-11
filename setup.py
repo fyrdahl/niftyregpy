@@ -26,6 +26,8 @@ if __name__ == "__main__":
             "Programming Language :: Python :: 3.8",
             "Programming Language :: Python :: 3.9",
             "Programming Language :: Python :: 3.10",
+            "Programming Language :: Python :: 3 :: Only",
+            "Topic :: Scientific/Engineering :: Medical Science Apps",
         ],
         install_requires=REQUIRED_PACKAGES,
         license="MIT",
