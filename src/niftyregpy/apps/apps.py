@@ -25,10 +25,10 @@ def groupwise(
 
     Args:
         input (array): Array that contains the images to create the atlas.
-        template (array): Template image to use to initialise the atlas creation (optional).
+        template (array): Template image to use to initialize the atlas creation (optional).
         input_mask (array): Verbose output (optional).
         template_mask (array): Mask for the template image (optional).
-        aff_it (int): Number of affine iterations to perform - Note that the first step is always rigid (default = 5).
+        aff_it (int): Number of affine iterations to perform (default = 5).
         nrr_it (int): Number of non-rigid iterations to perform (default = 10).
         affine_args (str): Arguments to use for the affine registration (optional).
         nrr_args (str): Arguments to use for the non-rigid registration (optional).
@@ -52,12 +52,12 @@ def groupwise(
     ), "More than 1 template is provided"
     assert len(input) == 2, "More than 1 template mask is provided"
 
-    if len(template) is None:
+    if template is None:
         template = input[0]
 
-    assert template_mask is None or len(template) == len(
-        template_mask
-    ), "The number of images is different from the number of floating masks"
+    assert (
+        template_mask is None or len(template_mask) > 1
+    ), "More than one template mask is provided"
 
     with tmp.TemporaryDirectory() as tmp_folder:
         # tmp_folder = tmp.mkdtemp()  # DEBUG
@@ -79,59 +79,54 @@ def groupwise(
         # Run the rigid or affine registration
         for cur_it in range(aff_it):
 
-            # Check if the iteration has already been performed
-            if not path.isfile(
-                path.join(tmp_folder, f"average_affine_it_{cur_it+1}.txt")
-            ):
+            for i, _ in enumerate(input):
 
-                for i, _ in enumerate(input):
+                aladin_args = ""
 
-                    aladin_args = ""
-
-                    if cur_it > 0:
-                        # Check if a previous affine can be use for initialization
-                        prev_affine_file = path.join(
-                            tmp_folder,
-                            f"aff_mat_input_{i}_it{cur_it}.txt",
-                        )
-                        if path.isfile(prev_affine_file):
-                            aladin_args += f" -inaff {prev_affine_file}"
-                    else:
-                        # Registration is forced to be rigid for the first iteration
-                        aladin_args += " -rigOnly"
-
-                    # Check if a mask has been specified for the reference image
-                    if template_mask is not None:
-                        aladin_args += " -rmask " + path.join(
-                            tmp_folder, "template_mask.nii"
-                        )
-
-                    if input_mask is not None:
-                        aladin_args += " -fmask " + path.join(
-                            tmp_folder, f"input_mask_{i}.nii"
-                        )
-
-                    cur_affine_file = path.join(
+                if cur_it > 0:
+                    # Check if a previous affine can be use for initialization
+                    prev_affine_file = path.join(
                         tmp_folder,
-                        f"aff_mat_input_{i}_it{cur_it+1}.txt",
+                        f"aff_mat_input_{i}_it{cur_it}.txt",
                     )
-                    aladin_args += f" -ref {average_image}"
-                    aladin_args += " -flo " + path.join(tmp_folder, f"input_{i}.nii")
-                    aladin_args += f" -aff {cur_affine_file}"
+                    if path.isfile(prev_affine_file):
+                        aladin_args += f" -inaff {prev_affine_file}"
+                else:
+                    # Registration is forced to be rigid for the first iteration
+                    aladin_args += " -rigOnly"
 
-                    if cur_it == aff_it - 1:
-                        aladin_args += " -res " + path.join(
-                            tmp_folder,
-                            f"aff_res_input_{i}_it{cur_it+1}.nii",
-                        )
+                # Check if a mask has been specified for the reference image
+                if template_mask is not None:
+                    aladin_args += " -rmask " + path.join(
+                        tmp_folder, "template_mask.nii"
+                    )
 
-                    if affine_args is not None:
-                        for x in shlex.split(affine_args):
-                            aladin_args += f" {x}"
+                if input_mask is not None:
+                    aladin_args += " -fmask " + path.join(
+                        tmp_folder, f"input_mask_{i}.nii"
+                    )
 
-                    aladin_cmd = "reg_aladin" + aladin_args
+                cur_affine_file = path.join(
+                    tmp_folder,
+                    f"aff_mat_input_{i}_it{cur_it+1}.txt",
+                )
+                aladin_args += f" -ref {average_image}"
+                aladin_args += " -flo " + path.join(tmp_folder, f"input_{i}.nii")
+                aladin_args += f" -aff {cur_affine_file}"
 
-                    assert call_niftyreg(aladin_cmd, verbose), "Aladin command failed!"
+                if cur_it == aff_it - 1:
+                    aladin_args += " -res " + path.join(
+                        tmp_folder,
+                        f"aff_res_input_{i}_it{cur_it+1}.nii",
+                    )
+
+                if affine_args is not None:
+                    for x in shlex.split(affine_args):
+                        aladin_args += f" {x}"
+
+                aladin_cmd = "reg_aladin" + aladin_args
+
+                assert call_niftyreg(aladin_cmd, verbose), "Aladin command failed!"
 
             if cur_it < aff_it - 1:
                 # The transformations are demeaned to create the average image
@@ -173,54 +168,49 @@ def groupwise(
 
         for cur_it in range(nrr_it):
 
-            # Check if the current average image has already been created
-            if not path.isfile(
-                path.join(tmp_folder, f"average_nonrigid_it_{cur_it+1}.nii")
-            ):
+            for i, _ in enumerate(input):
 
-                for i, _ in enumerate(input):
+                f3d_args = ""
 
-                    f3d_args = ""
+                f3d_args += f" -ref {average_image}"
 
-                    f3d_args += f" -ref {average_image}"
+                f3d_args += " -flo "
+                f3d_args += path.join(tmp_folder, f"input_{i}.nii")
 
-                    f3d_args += " -flo "
-                    f3d_args += path.join(tmp_folder, f"input_{i}.nii")
+                f3d_args += " -cpp "
+                f3d_args += path.join(
+                    tmp_folder,
+                    f"nrr_cpp_input_{i}_it{cur_it+1}.nii",
+                )
 
-                    f3d_args += " -cpp "
-                    f3d_args += path.join(
+                if cur_it == nrr_it - 1:
+                    f3d_args += " -res " + path.join(
                         tmp_folder,
-                        f"nrr_cpp_input_{i}_it{cur_it+1}.nii",
+                        f"nrr_res_input_{i}_it{cur_it+1}.nii",
                     )
 
-                    if cur_it == nrr_it - 1:
-                        f3d_args += " -res " + path.join(
-                            tmp_folder,
-                            f"nrr_res_input_{i}_it{cur_it+1}.nii",
-                        )
+                # Check if a mask has been specified for the reference image
+                if template_mask is not None:
+                    f3d_args += " -rmask "
+                    f3d_args += path.join(tmp_folder, "template_mask.nii")
 
-                    # Check if a mask has been specified for the reference image
-                    if template_mask is not None:
-                        f3d_args += " -rmask "
-                        f3d_args += path.join(tmp_folder, "template_mask.nii")
+                if input_mask is not None:
+                    f3d_args += " -fmask "
+                    f3d_args += path.join(tmp_folder, f"input_mask_{i}.nii")
 
-                    if input_mask is not None:
-                        f3d_args += " -fmask "
-                        f3d_args += path.join(tmp_folder, f"input_mask_{i}.nii")
+                if aff_it > 0:
+                    f3d_args += " -aff "
+                    f3d_args += path.join(
+                        tmp_folder,
+                        f"aff_mat_input_{i}_it{aff_it}.txt",
+                    )
 
-                    if aff_it > 0:
-                        f3d_args += " -aff "
-                        f3d_args += path.join(
-                            tmp_folder,
-                            f"aff_mat_input_{i}_it{aff_it}.txt",
-                        )
+                if nrr_args is not None:
+                    for x in shlex.split(nrr_args):
+                        f3d_args += f" {x}"
 
-                    if nrr_args is not None:
-                        for x in shlex.split(nrr_args):
-                            f3d_args += f" {x}"
-
-                    f3d_cmd = "reg_f3d " + f3d_args
-                    assert call_niftyreg(f3d_cmd, verbose), "f3d command failed!"
+                f3d_cmd = "reg_f3d " + f3d_args
+                assert call_niftyreg(f3d_cmd, verbose), "f3d command failed!"
 
             # The transformation are demeaned to create the average image
             # Note that this is not done for the last iteration step
