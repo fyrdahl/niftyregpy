@@ -1,5 +1,6 @@
 import os
 import re
+import shlex
 import tempfile as tmp
 from os import path
 
@@ -9,37 +10,54 @@ from ..utils import call_niftyreg, read_nifti, write_nifti
 
 
 def groupwise(
-    template,
     input,
-    template_mask=None,
+    template=None,
     input_mask=None,
+    template_mask=None,
     aff_it=5,
     nrr_it=10,
-    affine_args="",
-    nrr_args="",
+    affine_args=None,
+    nrr_args=None,
     verbose=False,
-):
+) -> tuple:
     """
     Groupwise image registration
 
     Args:
-        template (array): Template image to use to initialise the atlas creation.
-        input (string): Array that contains the images to create the atlas.
-        template_mask (bool): Mask for the template image.
-        input_mask (bool): Verbose output (default = False).
+        input (array): Array that contains the images to create the atlas.
+        template (array): Template image to use to initialise the atlas creation (optional).
+        input_mask (array): Verbose output (optional).
+        template_mask (array): Mask for the template image (optional).
         aff_it (int): Number of affine iterations to perform - Note that the first step is always rigid (default = 5).
         nrr_it (int): Number of non-rigid iterations to perform (default = 10).
-        affine_args (str): Arguments to use for the affine registration (reg_aladin).
-        nrr_args (str): Arguments to use for the non-rigid registration (reg_f3d).
+        affine_args (str): Arguments to use for the affine registration (optional).
+        nrr_args (str): Arguments to use for the non-rigid registration (optional).
         verbose (bool): Verbose output (default = False).
 
     Returns:
-        array: Average image
-        array: Registered input images
+        A tuple containing
+
+        - average (array): Average image
+        - reg (tuple): Registered input images as a tuple
 
     """
 
     assert len(input) >= 2, "Less than 2 input images have been specified"
+    assert input_mask is None or len(input) == len(
+        input_mask
+    ), "The number of images is different from the number of floating masks"
+
+    assert template is None or not isinstance(
+        template, tuple
+    ), "More than 1 template is provided"
+    assert len(input) == 2, "More than 1 template mask is provided"
+
+    if len(template) is None:
+        template = input[0]
+
+    assert template_mask is None or len(template) == len(
+        template_mask
+    ), "The number of images is different from the number of floating masks"
 
     with tmp.TemporaryDirectory() as tmp_folder:
         # tmp_folder = tmp.mkdtemp()  # DEBUG
@@ -107,7 +125,11 @@ def groupwise(
                             f"aff_res_input_{i}_it{cur_it+1}.nii",
                         )
 
-                    aladin_cmd = "reg_aladin" + aladin_args + " " + affine_args
+                    if affine_args is not None:
+                        for x in shlex.split(affine_args):
+                            aladin_args += f" {x}"
+
+                    aladin_cmd = "reg_aladin" + aladin_args
 
                     assert call_niftyreg(aladin_cmd, verbose), "Aladin command failed!"
 
@@ -193,7 +215,11 @@ def groupwise(
                             f"aff_mat_input_{i}_it{aff_it}.txt",
                         )
 
-                    f3d_cmd = "reg_f3d " + f3d_args + " " + nrr_args
+                    if nrr_args is not None:
+                        for x in shlex.split(nrr_args):
+                            f3d_args += f" {x}"
+
+                    f3d_cmd = "reg_f3d " + f3d_args
                     assert call_niftyreg(f3d_cmd, verbose), "f3d command failed!"
 
             # The transformation are demeaned to create the average image

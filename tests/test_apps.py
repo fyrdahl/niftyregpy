@@ -24,13 +24,13 @@ class TestApps:
         input_1 = common.rotate_array(input_1, angle=45)
 
         output = apps.groupwise(
-            ref,
             (input_0, input_1),
-            template_mask=common.create_circle(self.matrix_size),
+            ref,
             input_mask=(
                 common.create_circle(self.matrix_size),
                 common.create_circle(self.matrix_size),
             ),
+            template_mask=common.create_circle(self.matrix_size),
             affine_args="-maxit 5",
             nrr_args="-maxit 300",
             verbose=False,
