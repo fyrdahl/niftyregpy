@@ -11,14 +11,33 @@ from ..utils import call_niftyreg, read_nifti, write_nifti
 def groupwise(
     template,
     input,
-    input_mask=None,
     template_mask=None,
+    input_mask=None,
     aff_it=5,
     nrr_it=10,
     affine_args="",
     nrr_args="",
     verbose=False,
 ):
+    """
+    Groupwise image registration
+
+    Args:
+        template (array): Template image to use to initialise the atlas creation.
+        input (string): Array that contains the images to create the atlas.
+        template_mask (bool): Mask for the template image.
+        input_mask (bool): Verbose output (default = False).
+        aff_it (int): Number of affine iterations to perform - Note that the first step is always rigid (default = 5).
+        nrr_it (int): Number of non-rigid iterations to perform (default = 10).
+        affine_args (str): Arguments to use for the affine registration (reg_aladin).
+        nrr_args (str): Arguments to use for the non-rigid registration (reg_f3d).
+        verbose (bool): Verbose output (default = False).
+
+    Returns:
+        array: Average image
+        array: Registered input images
+
+    """
 
     assert len(input) >= 2, "Less than 2 input images have been specified"
 
