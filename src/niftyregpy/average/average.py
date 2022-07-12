@@ -127,16 +127,16 @@ def demean1(ref, aff, flo, verbose=False):
     with tmp.TemporaryDirectory() as tmp_folder:
 
         cmd_str = "reg_average "
-        cmd_str += os.path.join(tmp_folder, "output.nii") + "  -demean1 "
+        cmd_str += os.path.join(tmp_folder, "output.nii") + " -demean1 "
 
-        write_nifti(f"{tmp_folder}ref.nii", ref)
-        cmd_str += f"{tmp_folder}ref.nii "
+        write_nifti(os.path.join(tmp_folder, "ref.nii"), ref)
+        cmd_str += os.path.join(tmp_folder, "ref.nii ")
 
         for i, x in enumerate(zip(aff, flo)):
             write_txt(os.path.join(tmp_folder, f"avg_aff_{i}.txt"), x[0])
             write_nifti(os.path.join(tmp_folder, f"avg_flo_{i}.nii"), x[1])
             cmd_str += (
-                os.path.join(tmp_folder, f"avg_aff_{i}.nii")
+                os.path.join(tmp_folder, f"avg_aff_{i}.txt")
                 + " "
                 + os.path.join(tmp_folder, f"avg_flo_{i}.nii")
                 + " "
@@ -153,10 +153,10 @@ def demean2(ref, tran, flo, verbose=False):
     with tmp.TemporaryDirectory() as tmp_folder:
 
         cmd_str = "reg_average "
-        cmd_str += f"{tmp_folder}output.nii -demean2 "
+        cmd_str += os.path.join(tmp_folder, "output.nii") + " -demean2 "
 
         write_nifti(os.path.join(tmp_folder, "ref.nii"), ref)
-        cmd_str += f"{tmp_folder}ref.nii "
+        cmd_str += os.path.join(tmp_folder, "ref.nii ")
 
         for i, x in enumerate(zip(tran, flo)):
             write_nifti(os.path.join(tmp_folder, f"avg_tran_{i}.nii"), x[0])
