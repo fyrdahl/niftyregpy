@@ -13,19 +13,22 @@ class TestAverage:
         aff1 = common.random_affine()
         aff2 = common.random_affine()
         output = average.avg((aff1, aff2), verbose=True)
-        assert output is not None
+        assert output is not None and output.shape == (4, 4)
 
     def test_avg_image(self):
         img1 = common.random_array((self.matrix_size, self.matrix_size))
         img2 = common.random_array((self.matrix_size, self.matrix_size))
         output = average.avg((img1, img2), verbose=True)
-        assert output is not None
+        assert output is not None and output.shape == (
+            self.matrix_size,
+            self.matrix_size,
+        )
 
     def test_avg_lts(self):
         aff1 = common.random_affine()
         aff2 = common.random_affine()
         output = average.avg_lts((aff1, aff2), verbose=True)
-        assert output is not None
+        assert output is not None and output.shape == (4, 4)
 
     def test_avg_tran_affine(self):
         ref = common.random_array((self.matrix_size, self.matrix_size))
@@ -34,7 +37,10 @@ class TestAverage:
         tran1 = common.random_affine()
         tran2 = common.random_affine()
         output = average.avg_tran(ref, (flo1, flo2), (tran1, tran2), verbose=True)
-        assert output is not None
+        assert output is not None and output.shape == (
+            self.matrix_size,
+            self.matrix_size,
+        )
 
     def test_avg_tran_nii(self):
         ref = common.random_array((self.matrix_size, self.matrix_size))
@@ -43,7 +49,10 @@ class TestAverage:
         tran1 = common.random_array((self.matrix_size, self.matrix_size))
         tran2 = common.random_array((self.matrix_size, self.matrix_size))
         output = average.avg_tran(ref, (flo1, flo2), (tran1, tran2), verbose=True)
-        assert output is not None
+        assert output is not None and output.shape == (
+            self.matrix_size,
+            self.matrix_size,
+        )
 
     def test_demean1(self):
         ref = common.random_array((self.matrix_size, self.matrix_size))
@@ -52,7 +61,10 @@ class TestAverage:
         flo1 = common.random_array((self.matrix_size, self.matrix_size))
         flo2 = common.random_array((self.matrix_size, self.matrix_size))
         output = average.avg_tran(ref, (aff1, aff2), (flo1, flo2), verbose=True)
-        assert output is not None
+        assert output is not None and output.shape == (
+            self.matrix_size,
+            self.matrix_size,
+        )
 
     def test_demean2(self):
         ref = common.random_array((self.matrix_size, self.matrix_size))
@@ -61,7 +73,10 @@ class TestAverage:
         flo1 = common.random_array((self.matrix_size, self.matrix_size))
         flo2 = common.random_array((self.matrix_size, self.matrix_size))
         output = average.avg_tran(ref, (tran1, tran2), (flo1, flo2), verbose=True)
-        assert output is not None
+        assert output is not None and output.shape == (
+            self.matrix_size,
+            self.matrix_size,
+        )
 
     def test_demean3(self):
         ref = common.random_array((self.matrix_size, self.matrix_size))
@@ -74,7 +89,10 @@ class TestAverage:
         output = average.demean3(
             ref, (aff1, aff2), (tran1, tran2), (flo1, flo2), verbose=True
         )
-        assert output is not None
+        assert output is not None and output.shape == (
+            self.matrix_size,
+            self.matrix_size,
+        )
 
     def test_demean_noaff(self):
         ref = common.random_array((self.matrix_size, self.matrix_size))
@@ -87,4 +105,7 @@ class TestAverage:
         output = average.demean_noaff(
             ref, (aff1, aff2), (tran1, tran2), (flo1, flo2), verbose=True
         )
-        assert output is not None
+        assert output is not None and output.shape == (
+            self.matrix_size,
+            self.matrix_size,
+        )

@@ -23,7 +23,7 @@ def _avg_txt(input, verbose=False):
     with tmp.TemporaryDirectory() as tmp_folder:
 
         cmd_str = "reg_average "
-        cmd_str += os.path.join(tmp_folder, "output.txt") + "  -avg "
+        cmd_str += os.path.join(tmp_folder, "output.txt") + " -avg "
 
         for i, x in enumerate(input):
             write_txt(os.path.join(tmp_folder, f"avg_{i}.txt"), x)
@@ -40,7 +40,7 @@ def _avg_nii(input, verbose=False):
     with tmp.TemporaryDirectory() as tmp_folder:
 
         cmd_str = "reg_average "
-        cmd_str += os.path.join(tmp_folder, "output.nii") + "  -avg "
+        cmd_str += os.path.join(tmp_folder, "output.nii") + " -avg "
 
         for i, x in enumerate(input):
             write_nifti(os.path.join(tmp_folder, f"avg_{i}.nii"), x)
@@ -114,6 +114,8 @@ def avg_tran(ref, tran, flo, verbose=False):
 def demean1(ref, aff, flo, verbose=False):
 
     """
+    Average images and demean average image that have affine transformations to a common space
+
     The demean1 option enforces the mean of all affine matrices to have a
     Jacobian determinant equal to one. This is done by computing the average
     transformation by considering only the scaling and shearing arguments.
@@ -150,6 +152,10 @@ def demean1(ref, aff, flo, verbose=False):
 
 def demean2(ref, tran, flo, verbose=False):
 
+    """
+    Average images and demean average image that have non-rigid
+    transformations to a common space.
+    """
     with tmp.TemporaryDirectory() as tmp_folder:
 
         cmd_str = "reg_average "
@@ -176,6 +182,10 @@ def demean2(ref, tran, flo, verbose=False):
 
 def demean3(ref, aff, tran, flo, verbose=False):
 
+    """
+    Average images and demean average image that have linear and non-rigid
+    transformations to a common space.
+    """
     with tmp.TemporaryDirectory() as tmp_folder:
 
         cmd_str = "reg_average "
