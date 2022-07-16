@@ -6,6 +6,7 @@ Tools (`niftyregpy.tools`)
 
 .. autosummary::
     :toctree: generated
+    :nosignatures:
 
     niftyregpy.tools.float
     niftyregpy.tools.down

@@ -6,6 +6,7 @@ Average (`niftyregpy.average`)
 
 .. autosummary::
     :toctree: generated
+    :nosignatures:
 
     niftyregpy.average.avg
     niftyregpy.average.avg_lts
