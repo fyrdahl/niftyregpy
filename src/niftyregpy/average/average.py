@@ -8,8 +8,9 @@ def avg(input, verbose=False):
 
     """
     If the ``input`` are images, the intensities are averaged
-    If the input are affine matrices;
-        out = expm( (logm(M1) + logm(M2) + ... + logm(MN) ) / N )
+    Corresponding Python code if the input are affine matrices;
+        >>> from scipy.linalg import logm, expm
+        >>> out = expm((logm(M1)+logm(M2)+ ... +logm(MN))/N)
     """
 
     if all([a.shape == (4, 4) for a in input]):
