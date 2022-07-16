@@ -1,4 +1,4 @@
-Tools (`niftyregpy.tools`)
+Average (`niftyregpy.average`)
 ==========================
 
 .. automodule:: niftyregpy.average
