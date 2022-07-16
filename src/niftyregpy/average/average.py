@@ -7,9 +7,9 @@ from ..utils import call_niftyreg, read_nifti, read_txt, write_nifti, write_txt
 def avg(input, verbose=False):
 
     """
-    If the input are images, the intensities are averaged
+    If the ``input`` are images, the intensities are averaged
     If the input are affine matrices;
-        out=expm((logm(M1)+logm(M2)+...+logm(MN))/N)
+        out = expm( (logm(M1) + logm(M2) + ... + logm(MN) ) / N )
     """
 
     if all([a.shape == (4, 4) for a in input]):
@@ -79,8 +79,8 @@ def avg_lts(aff, verbose=False):
 def avg_tran(ref, tran, flo, verbose=False):
 
     """
-    All input images are resampled into the space of <reference image> and
-    averaged A cubic spline interpolation scheme is used for resampling.
+    All input images are resampled into the space of ``ref`` and
+    averaged. A cubic spline interpolation scheme is used for resampling.
     """
 
     assert len(flo) == len(
