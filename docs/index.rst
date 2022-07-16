@@ -14,6 +14,12 @@
 
 .. toctree::
     :hidden:
+    :caption: Average
+
+    average
+
+.. toctree::
+    :hidden:
     :caption: Apps
 
     apps
