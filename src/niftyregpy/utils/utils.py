@@ -2,6 +2,7 @@
 """Utility functions.
 """
 
+import random
 import shlex
 import signal
 import subprocess as sp
@@ -104,3 +105,22 @@ def is_function_available(tool: str, name: str) -> bool:
 
     except FileNotFoundError:
         return False
+
+
+def create_test_image(length=256, blobs=6, min_rad=3, max_rad=32, dtype=float):
+
+    array = np.zeros((length, length))
+    for i in range(blobs):
+        r = random.uniform(a=min_rad, b=max_rad)
+        c = (random.uniform(a=r, b=length - r), random.uniform(a=r, b=length - r))
+        array += _create_circle(length, c=c, r=r, dtype=dtype)
+
+    return (array > 0).astype(dtype)
+
+
+def _create_circle(length, c=None, r=None, dtype=float):
+
+    Y, X = np.ogrid[:length, :length]
+    circ = np.sqrt((X - c[0]) ** 2 + (Y - c[1]) ** 2) <= r
+
+    return circ.astype(dtype)

@@ -8,7 +8,7 @@ if __name__ == "__main__":
         name="niftyregpy",
         version="0.0.2",
         author="fyrdahl",
-        author_email="fyrdahl@med.umich.edu",
+        author_email="alexander.fyrdahl@gmail.com",
         description="Python interface for NiftyReg",
         packages=[
             "niftyregpy",

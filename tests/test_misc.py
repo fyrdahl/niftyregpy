@@ -27,3 +27,7 @@ class TestMisc:
     def test_read_txt_fail(self):
         retval = utils.read_txt(f"{common.random_float()}_test.txt")
         assert retval is None
+
+    def test_create_test_image(self):
+        image = utils.create_test_image(length=256, blobs=6, min_rad=3, max_rad=32)
+        assert image is not None
