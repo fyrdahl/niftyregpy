@@ -6,7 +6,14 @@ from os import path
 import numpy as np
 
 from ..average import avg, avg_lts, avg_tran, demean1, demean2, demean3
-from ..utils import call_niftyreg, read_nifti, read_txt, write_nifti, write_txt
+from ..utils import (
+    call_niftyreg,
+    is_function_available,
+    read_nifti,
+    read_txt,
+    write_nifti,
+    write_txt,
+)
 
 
 def aladin(
@@ -38,6 +45,8 @@ def aladin(
     pi=None,
     speeeeed=None,
     omp=None,
+    NN=None,
+    LIN=None,
     user_opts=None,
     verbose=False,
 ):
@@ -145,6 +154,12 @@ def aladin(
 
         if omp is not None:
             opts_str += f" -omp {omp}"
+
+        if NN is not None and is_function_available("reg_aladin", "NN"):
+            opts_str += " --NN"
+
+        if LIN is not None and is_function_available("reg_aladin", "LIN"):
+            opts_str += " --LIN"
 
         if user_opts is not None:
             for x in shlex.split(user_opts):
