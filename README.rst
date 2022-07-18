@@ -13,4 +13,8 @@ niftyregpy
         :target: https://codecov.io/gh/fyrdahl/niftyregpy
         :alt: Coverage
 
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+        :target: https://github.com/psf/black
+        :alt: Codestyle: Black
+
 Python Wrapper for `NiftyReg <http://cmictig.cs.ucl.ac.uk/wiki/index.php/NiftyReg>`_
