@@ -19,15 +19,19 @@ jobs:
         python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
 
     steps:
-      - name: Checkout and setup
-        steps:
-          - uses: actions/checkout@v3
-          - uses: actions/setup-python@v4
-            with:
-              python-version: ${{ matrix.python-version }}
-          - run: python -m pip install --upgrade pip
-          - run: python -m pip install .
-          - run: python -m pip install coverage[toml] tox tox-gh-actions
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install .
+          python -m pip install --upgrade coverage[toml] tox tox-gh-actionsverage[toml] tox tox-gh-actions
 
       - name: Clone NiftyReg
         uses: actions/checkout@v3
