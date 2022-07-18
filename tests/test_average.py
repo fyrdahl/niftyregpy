@@ -1,4 +1,5 @@
 from niftyregpy import average
+from scipy.linalg import expm, logm
 
 import test_common as common
 
@@ -13,7 +14,10 @@ class TestAverage:
         aff1 = common.random_affine()
         aff2 = common.random_affine()
         output = average.avg((aff1, aff2), verbose=True)
-        assert output is not None and output.shape == (4, 4)
+        assert (
+            output is not None
+            and ((output - expm((logm(aff1) + logm(aff2)) / 2)) < self.tol).all()
+        )
 
     def test_avg_image(self):
         img1 = common.random_array((self.matrix_size, self.matrix_size))

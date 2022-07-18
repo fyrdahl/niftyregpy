@@ -4,51 +4,58 @@ import tempfile as tmp
 from ..utils import call_niftyreg, read_nifti, read_txt, write_nifti, write_txt
 
 
-def avg(input, verbose=False):
+def avg(input, output=None, verbose=False):
 
     """
-    If the ``input`` are images, the intensities are averaged
-    Corresponding Python code if the input are affine matrices;
+    If ``input`` are images, their intensities are averaged.
+
+    If ``input`` are affine matrices, the result will correspond to
         >>> from scipy.linalg import logm, expm
-        >>> out = expm((logm(M1)+logm(M2)+ ... +logm(MN))/N)
+        >>> out = expm((logm(M1)+logm(M2)+...+logm(MN))/N)
     """
 
     if all([a.shape == (4, 4) for a in input]):
-        return _avg_txt(input, verbose)
+        return _avg_txt(input, output, verbose)
     else:
-        return _avg_nii(input, verbose)
+        return _avg_nii(input, output, verbose)
 
 
-def _avg_txt(input, verbose=False):
+def _avg_txt(input, output=None, verbose=False):
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        cmd_str = "reg_average "
-        cmd_str += os.path.join(tmp_folder, "output.txt") + " -avg "
+        if output is None:
+            output = os.path.join(tmp_folder, "output.txt")
+
+        cmd_str = f"reg_average {output}"
+        cmd_str += " -avg "
 
         for i, x in enumerate(input):
             write_txt(os.path.join(tmp_folder, f"avg_{i}.txt"), x)
             cmd_str += os.path.join(tmp_folder, f"avg_{i}.txt") + " "
 
         if call_niftyreg(cmd_str, verbose):
-            return read_txt(os.path.join(tmp_folder, "output.txt"))
+            return read_txt(output)
         else:
             return None
 
 
-def _avg_nii(input, verbose=False):
+def _avg_nii(input, output=None, verbose=False):
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        cmd_str = "reg_average "
-        cmd_str += os.path.join(tmp_folder, "output.nii") + " -avg "
+        if output is None:
+            output = os.path.join(tmp_folder, "output.nii")
+
+        cmd_str = f"reg_average {output}"
+        cmd_str += " -avg "
 
         for i, x in enumerate(input):
             write_nifti(os.path.join(tmp_folder, f"avg_{i}.nii"), x)
             cmd_str += os.path.join(tmp_folder, f"avg_{i}.nii") + " "
 
         if call_niftyreg(cmd_str, verbose):
-            return read_nifti(os.path.join(tmp_folder, "output.nii"))
+            return read_nifti(output)
         else:
             return None
 
