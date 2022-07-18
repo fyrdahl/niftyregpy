@@ -2,3 +2,6 @@ tox==3.25.1
 pytest==7.0.1
 pytest-cov==3.0.0
 scikit-image
+black
+flake8
+scipy

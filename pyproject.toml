@@ -1,3 +1,19 @@
 [build-system]
 requires = ["setuptools","wheel","numpy","nibabel","tqdm"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "niftyregpy"
+description = "Python Wrapper for NiftyReg"
+readme = "README.rst"
+requires-python = ">=3.6"
+dependencies = [
+    "numpy",
+    "nibabel",
+    "tqdm",
+]
+dynamic = ["version"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["niftyregpy*"]
