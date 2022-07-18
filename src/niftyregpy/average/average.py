@@ -7,11 +7,20 @@ from ..utils import call_niftyreg, read_nifti, read_txt, write_nifti, write_txt
 def avg(input, output=None, verbose=False):
 
     """
-    If ``input`` are images, their intensities are averaged.
+    If input are images, their intensities are averaged.
 
-    If ``input`` are affine matrices, the result will correspond to
+    If input are affine matrices, the result will correspond to
         >>> from scipy.linalg import logm, expm
         >>> out = expm((logm(M1)+logm(M2)+...+logm(MN))/N)
+
+    Args:
+        input (tuple): Input images or affines to be averaged.
+        output (string): Specify output file (optional).
+        verbose (bool): Verbose output (default = False).
+
+    Returns:
+        array: Averaged input array.
+
     """
 
     if all([a.shape == (4, 4) for a in input]):
@@ -60,35 +69,58 @@ def _avg_nii(input, output=None, verbose=False):
             return None
 
 
-def avg_lts(aff, verbose=False):
+def avg_lts(aff, output=None, verbose=False):
 
     """
     Estimate the robust average affine matrix by considering half of the
     matrices as outliers.
+
+    Args:
+        aff (tuple): Affines to be averaged.
+        output (string): Specify output file (optional).
+        verbose (bool): Verbose output (default = False).
+
+    Returns:
+        array: Averaged input array.
+
     """
 
     assert all([a.shape == (4, 4) for a in aff]), "Not affine matrices"
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        cmd_str = "reg_average "
-        cmd_str += os.path.join(tmp_folder, "output.txt") + "  -avg "
+        if output is None:
+            output = os.path.join(tmp_folder, "output.txt")
+
+        cmd_str = f"reg_average {output}"
+        cmd_str += " -avg_lts "
 
         for i, x in enumerate(aff):
             write_txt(os.path.join(tmp_folder, f"avg_{i}.txt"), x)
             cmd_str += os.path.join(tmp_folder, f"avg_{i}.txt") + " "
 
         if call_niftyreg(cmd_str, verbose):
-            return read_txt(os.path.join(tmp_folder, "output.txt"))
+            return read_txt(output)
         else:
             return None
 
 
-def avg_tran(ref, tran, flo, verbose=False):
+def avg_tran(ref, tran, flo, output=None, verbose=False):
 
     """
     All input images are resampled into the space of ``ref`` and
     averaged. A cubic spline interpolation scheme is used for resampling.
+
+    Args:
+        ref (array): Reference image.
+        tran (tuple): Transforms.
+        flo (tuple): Floating images.
+        output (string): Specify output file (optional).
+        verbose (bool): Verbose output (default = False).
+
+    Returns:
+        array: Averaged floating images.
+
     """
 
     assert len(flo) == len(
@@ -97,8 +129,11 @@ def avg_tran(ref, tran, flo, verbose=False):
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        cmd_str = "reg_average "
-        cmd_str += os.path.join(tmp_folder, "output.nii") + " -avg_tran "
+        if output is None:
+            output = os.path.join(tmp_folder, "output.nii")
+
+        cmd_str = f"reg_average {output}"
+        cmd_str += " -avg_tran "
 
         write_nifti(os.path.join(tmp_folder, "ref.nii"), ref)
         cmd_str += os.path.join(tmp_folder, "ref.nii") + " "
@@ -106,23 +141,20 @@ def avg_tran(ref, tran, flo, verbose=False):
         for i, x in enumerate(zip(tran, flo)):
             write_nifti(os.path.join(tmp_folder, f"avg_tran_{i}.nii"), x[0])
             write_nifti(os.path.join(tmp_folder, f"avg_flo_{i}.nii"), x[1])
-            cmd_str += (
-                os.path.join(tmp_folder, f"avg_tran_{i}.nii")
-                + " "
-                + os.path.join(tmp_folder, f"avg_flo_{i}.nii")
-                + " "
-            )
+            cmd_str += os.path.join(tmp_folder, f"avg_tran_{i}.nii") + " "
+            cmd_str += os.path.join(tmp_folder, f"avg_flo_{i}.nii") + " "
 
         if call_niftyreg(cmd_str, verbose):
-            return read_nifti(os.path.join(tmp_folder, "output.nii"))
+            return read_nifti(output)
         else:
             return None
 
 
-def demean1(ref, aff, flo, verbose=False):
+def demean1(ref, aff, flo, output=None, verbose=False):
 
     """
-    Average images and demean average image that have affine transformations to a common space
+    Average images and demean average image that have affine transformations to
+    a common space
 
     The demean1 option enforces the mean of all affine matrices to have a
     Jacobian determinant equal to one. This is done by computing the average
@@ -130,14 +162,28 @@ def demean1(ref, aff, flo, verbose=False):
     The inverse of this computed average matrix is then removed to all input
     affine matrix before resampling all floating images to the user-defined
     reference space
+
+    Args:
+        ref (array): Reference image.
+        aff (tuple): Affines.
+        flo (tuple): Floating images.
+        output (string): Specify output file (optional).
+        verbose (bool): Verbose output (default = False).
+
+    Returns:
+        array: Averaged floating images.
+
     """
 
     assert len(aff) == len(flo), "Non-matching number of floating images and transforms"
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        cmd_str = "reg_average "
-        cmd_str += os.path.join(tmp_folder, "output.nii") + " -demean1 "
+        if output is None:
+            output = os.path.join(tmp_folder, "output.nii")
+
+        cmd_str = f"reg_average {output}"
+        cmd_str += " -demean1 "
 
         write_nifti(os.path.join(tmp_folder, "ref.nii"), ref)
         cmd_str += os.path.join(tmp_folder, "ref.nii ")
@@ -145,29 +191,40 @@ def demean1(ref, aff, flo, verbose=False):
         for i, x in enumerate(zip(aff, flo)):
             write_txt(os.path.join(tmp_folder, f"avg_aff_{i}.txt"), x[0])
             write_nifti(os.path.join(tmp_folder, f"avg_flo_{i}.nii"), x[1])
-            cmd_str += (
-                os.path.join(tmp_folder, f"avg_aff_{i}.txt")
-                + " "
-                + os.path.join(tmp_folder, f"avg_flo_{i}.nii")
-                + " "
-            )
+            cmd_str += os.path.join(tmp_folder, f"avg_aff_{i}.txt") + " "
+            cmd_str += os.path.join(tmp_folder, f"avg_flo_{i}.nii") + " "
 
         if call_niftyreg(cmd_str, verbose):
-            return read_nifti(os.path.join(tmp_folder, "output.nii"))
+            return read_nifti(output)
         else:
             return None
 
 
-def demean2(ref, tran, flo, verbose=False):
+def demean2(ref, tran, flo, output=None, verbose=False):
 
     """
     Average images and demean average image that have non-rigid
     transformations to a common space.
+
+    Args:
+        ref (array): Reference image.
+        tran (tuple): Transforms.
+        flo (tuple): Floating images.
+        output (string): Specify output file (optional).
+        verbose (bool): Verbose output (default = False).
+
+    Returns:
+        array: Averaged floating images.
+
     """
+
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        cmd_str = "reg_average "
-        cmd_str += os.path.join(tmp_folder, "output.nii") + " -demean2 "
+        if output is None:
+            output = os.path.join(tmp_folder, "output.nii")
+
+        cmd_str = f"reg_average {output}"
+        cmd_str += " -demean2 "
 
         write_nifti(os.path.join(tmp_folder, "ref.nii"), ref)
         cmd_str += os.path.join(tmp_folder, "ref.nii ")
@@ -175,29 +232,41 @@ def demean2(ref, tran, flo, verbose=False):
         for i, x in enumerate(zip(tran, flo)):
             write_nifti(os.path.join(tmp_folder, f"avg_tran_{i}.nii"), x[0])
             write_nifti(os.path.join(tmp_folder, f"avg_flo_{i}.nii"), x[1])
-            cmd_str += (
-                os.path.join(tmp_folder, f"avg_tran_{i}.nii")
-                + " "
-                + os.path.join(tmp_folder, f"avg_flo_{i}.nii")
-                + " "
-            )
+            cmd_str += os.path.join(tmp_folder, f"avg_tran_{i}.nii") + " "
+            cmd_str += os.path.join(tmp_folder, f"avg_flo_{i}.nii") + " "
 
         if call_niftyreg(cmd_str, verbose):
-            return read_nifti(os.path.join(tmp_folder, "output.nii"))
+            return read_nifti(output)
         else:
             return None
 
 
-def demean3(ref, aff, tran, flo, verbose=False):
+def demean3(ref, aff, tran, flo, output=None, verbose=False):
 
     """
     Average images and demean average image that have linear and non-rigid
     transformations to a common space.
+
+    Args:
+        ref (array): Reference image.
+        aff (tuple): Affines.
+        tran (tuple): Transforms.
+        flo (tuple): Floating images.
+        output (string): Specify output file (optional).
+        verbose (bool): Verbose output (default = False).
+
+    Returns:
+        array: Averaged floating images.
+
     """
+
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        cmd_str = "reg_average "
-        cmd_str += os.path.join(tmp_folder, "output.nii") + " -demean3 "
+        if output is None:
+            output = os.path.join(tmp_folder, "output.nii")
+
+        cmd_str = f"reg_average {output}"
+        cmd_str += " -demean3 "
 
         write_nifti(os.path.join(tmp_folder, "ref.nii"), ref)
         cmd_str += os.path.join(tmp_folder, "ref.nii") + " "
@@ -206,32 +275,41 @@ def demean3(ref, aff, tran, flo, verbose=False):
             write_txt(os.path.join(tmp_folder, f"avg_aff_{i}.txt"), x[0])
             write_nifti(os.path.join(tmp_folder, f"avg_tran_{i}.nii"), x[1])
             write_nifti(os.path.join(tmp_folder, f"avg_flo_{i}.nii"), x[2])
-            cmd_str += (
-                os.path.join(tmp_folder, f"avg_aff_{i}.txt")
-                + " "
-                + os.path.join(tmp_folder, f"avg_tran_{i}.nii")
-                + " "
-                + os.path.join(tmp_folder, f"avg_flo_{i}.nii")
-                + " "
-            )
+            cmd_str += os.path.join(tmp_folder, f"avg_aff_{i}.txt") + " "
+            cmd_str += os.path.join(tmp_folder, f"avg_tran_{i}.nii") + " "
+            cmd_str += os.path.join(tmp_folder, f"avg_flo_{i}.nii") + " "
 
         if call_niftyreg(cmd_str, verbose):
-            return read_nifti(os.path.join(tmp_folder, "output.nii"))
+            return read_nifti(output)
         else:
             return None
 
 
-def demean_noaff(ref, aff, tran, flo, verbose=False):
+def demean_noaff(ref, aff, tran, flo, output=None, verbose=False):
 
     """
     Same as the demean expect that the specified affine is removed from the
     non-linear (euclidean) transformation.
-    """
 
+    Args:
+        ref (array): Reference image.
+        aff (tuple): Affines.
+        tran (tuple): Transforms.
+        flo (tuple): Floating images.
+        output (string): Specify output file (optional).
+        verbose (bool): Verbose output (default = False).
+
+    Returns:
+        array: Averaged floating images.
+
+    """
     with tmp.TemporaryDirectory() as tmp_folder:
 
-        cmd_str = "reg_average "
-        cmd_str += os.path.join(tmp_folder, "output.nii") + " -demean_noaff "
+        if output is None:
+            output = os.path.join(tmp_folder, "output.nii")
+
+        cmd_str = f"reg_average {output}"
+        cmd_str += " -demean_noaff "
 
         write_nifti(os.path.join(tmp_folder, "ref.nii"), ref)
         cmd_str += os.path.join(tmp_folder, "ref.nii") + " "
@@ -240,16 +318,11 @@ def demean_noaff(ref, aff, tran, flo, verbose=False):
             write_txt(os.path.join(tmp_folder, f"avg_aff_{i}.txt"), x[0])
             write_nifti(os.path.join(tmp_folder, f"avg_tran_{i}.nii"), x[1])
             write_nifti(os.path.join(tmp_folder, f"avg_flo_{i}.nii"), x[2])
-            cmd_str += (
-                os.path.join(tmp_folder, f"avg_aff_{i}.txt")
-                + " "
-                + os.path.join(tmp_folder, f"avg_tran_{i}.nii")
-                + " "
-                + os.path.join(tmp_folder, f"avg_flo_{i}.nii")
-                + " "
-            )
+            cmd_str += os.path.join(tmp_folder, f"avg_aff_{i}.txt") + " "
+            cmd_str += os.path.join(tmp_folder, f"avg_tran_{i}.nii") + " "
+            cmd_str += os.path.join(tmp_folder, f"avg_flo_{i}.nii") + " "
 
         if call_niftyreg(cmd_str, verbose):
-            return read_nifti(os.path.join(tmp_folder, "output.nii"))
+            return read_nifti(output)
         else:
             return None
