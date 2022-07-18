@@ -18,3 +18,8 @@ niftyregpy
         :alt: Codestyle: Black
 
 Python Wrapper for `NiftyReg <http://cmictig.cs.ucl.ac.uk/wiki/index.php/NiftyReg>`_
+
+Tutorial:
+.. image:: https://colab.research.google.com/assets/colab-badge.svg
+        :target: https://colab.research.google.com/github/fyrdahl/niftyregpy/blob/master/tutorial/tutorial.ipynb
+        :alt: Open in Google Colab
