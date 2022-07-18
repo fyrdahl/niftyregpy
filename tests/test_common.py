@@ -115,8 +115,8 @@ def rotate_array(array, angle):
 def shear_array(array, angle):
     angle_rad = np.deg2rad(angle)
     tform_trans = transform.AffineTransform(translation=-array.shape[0] // 2)
-    tform_rot = transform.AffineTransform(shear=angle_rad)
-    return transform.warp(array, tform_trans + tform_rot + tform_trans.inverse)
+    tform_shear = transform.AffineTransform(shear=angle_rad)
+    return transform.warp(array, tform_trans + tform_shear + tform_trans.inverse)
 
 
 def crop_center(img, crop_x, crop_y):

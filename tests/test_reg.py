@@ -1,5 +1,5 @@
 import numpy as np
-from niftyregpy import reg
+from niftyregpy import reg, utils
 from skimage import transform
 
 import test_common as common
@@ -21,11 +21,25 @@ class TestReg:
         output = reg.resample(ref, flo, trans=affine, inter=0, verbose=self.verbose)
         assert output is not None
 
-    def test_aladin(self):
-        ref = common.create_square(self.matrix_size, size=self.object_size)
+    def test_aladin1(self):
+        ref = utils.create_test_image(self.matrix_size)
+        flo = common.rotate_array(ref, angle=45)
+        flo = common.shear_array(flo, angle=10)
+        output = reg.aladin(ref, flo)
+        assert 1 - common.dice(ref, output[0]) < self.tol
+
+    def test_aladin2(self):
+        ref = utils.create_test_image(self.matrix_size)
         flo = common.rotate_array(ref, angle=45)
         flo = common.shear_array(flo, angle=10)
         output = reg.aladin(ref, flo, verbose=self.verbose)
+        assert 1 - common.dice(ref, output[0]) < self.tol
+
+    def test_aladin3(self):
+        ref = utils.create_test_image(self.matrix_size)
+        flo = common.rotate_array(ref, angle=45)
+        flo = common.shear_array(flo, angle=10)
+        output = reg.aladin(ref, flo, user_opts="-voff")
         assert 1 - common.dice(ref, output[0]) < self.tol
 
     def test_aladin_rigonly(self):

@@ -150,7 +150,7 @@ def aladin(
             for x in shlex.split(user_opts):
                 opts_str += f" {x}"
 
-        if not verbose and "-voff" not in user_opts:
+        if not verbose and user_opts is not None and "-voff" not in user_opts:
             opts_str += " -voff"
 
         cmd_str += opts_str
@@ -393,7 +393,7 @@ def f3d(
             for x in shlex.split(user_opts):
                 opts_str += f" {x}"
 
-        if not verbose and "-voff" not in user_opts:
+        if not verbose and user_opts is not None and "-voff" not in user_opts:
             opts_str += " -voff"
 
         cmd_str += opts_str
