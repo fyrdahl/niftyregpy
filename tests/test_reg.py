@@ -17,7 +17,7 @@ class TestReg:
     def test_resample_affine(self):
         ref = common.create_square(self.matrix_size, size=self.object_size)
         flo = ref = common.create_square(self.matrix_size, size=self.object_size)
-        affine = common.random_rigid()
+        affine = common.random_affine(rigid=True)
         output = reg.resample(ref, flo, trans=affine, inter=0, verbose=self.verbose)
         assert output is not None
 

@@ -18,25 +18,16 @@ def random_array(shape, dtype=np.float32):
     return random_array.astype(dtype)
 
 
-def random_affine(dtype=np.float32):
+def random_affine(rigid=False, dtype=np.float32):
     phi = random_float(-np.pi, np.pi)
     aff = np.eye(4)
     aff[0, 0] = np.cos(phi)
     aff[0, 1] = -np.sin(phi)
     aff[1, 0] = np.sin(phi)
     aff[1, 1] = np.cos(phi)
-    aff[0, 3] = 0.5 + random_float(-0.1, 0.1)
-    aff[1, 3] = 1.0 + random_float(-0.1, 0.1)
-    return aff.astype(dtype)
-
-
-def random_rigid(dtype=np.float32):
-    phi = random_float(-np.pi, np.pi)
-    aff = np.eye(4)
-    aff[0, 0] = np.cos(phi)
-    aff[0, 1] = -np.sin(phi)
-    aff[1, 0] = np.sin(phi)
-    aff[1, 1] = np.cos(phi)
+    if not rigid:
+        aff[0, 3] = 0.5 + random_float(-0.1, 0.1)
+        aff[1, 3] = 1.0 + random_float(-0.1, 0.1)
     return aff.astype(dtype)
 
 
@@ -48,7 +39,7 @@ def create_circle(length, c=None, r=None, dtype=np.float32):
 
     if c is None:
         c = length // 2, length // 2
-    elif c != tuple:
+    elif not isinstance(c, tuple):
         c = (c, c)
     if r is None:
         r = min(c[0], c[1], length - c[0], length - c[1])
@@ -63,9 +54,9 @@ def create_square(length, c=None, size=None, dtype=np.float32):
 
     if c is None:
         c = length // 2, length // 2
-    elif c != tuple:
+    elif not isinstance(c, tuple):
         c = (c, c)
-    if size != tuple:
+    if not isinstance(size, tuple):
         size = (size, size)
 
     h = int(np.floor(size[0]))
@@ -100,7 +91,7 @@ def apply_swirl(array, c=None, s=10, r=None):
 
     if c is None:
         c = tuple(x // 2 for x in array.shape)
-    elif c != tuple:
+    elif not isinstance(c, tuple):
         c = (c, c)
 
     if r is None:
@@ -126,3 +117,10 @@ def shear_array(array, angle):
     tform_trans = transform.AffineTransform(translation=-array.shape[0] // 2)
     tform_rot = transform.AffineTransform(shear=angle_rad)
     return transform.warp(array, tform_trans + tform_rot + tform_trans.inverse)
+
+
+def crop_center(img, crop_x, crop_y):
+    y, x = img.shape
+    start_x = x // 2 - crop_x // 2
+    start_y = y // 2 - crop_y // 2
+    return img[start_y : start_y + crop_y, start_x : start_x + crop_x]
