@@ -8,6 +8,7 @@ on:
       - "**/README.rst"
       - "**/.readthedocs.yml"
       - "docs/**/*"
+      - "tutorial/**/*"
 
 jobs:
   test:
