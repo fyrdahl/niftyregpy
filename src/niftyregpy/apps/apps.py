@@ -28,7 +28,7 @@ def groupwise(
     first ``aff_it`` number of affine registrations (reg_aladin) are performed,
     the first is a rigid registration. Second, ``nrr_it`` number of non-rigid
     registrations (reg_f3d) are performed. After each full iteration, the
-    transforms are averaged, and used to initiliaze in the next iteration.
+    transforms are averaged, and used to initiliaze the next iteration.
 
     Arguments can be passed to both reg_aladin and reg_f3d using the
     ``affine_args`` and ``nrr_args`` arguments.
@@ -68,7 +68,6 @@ def groupwise(
     assert template is None or not isinstance(
         template, tuple
     ), "More than 1 template is provided"
-    assert len(input) == 2, "More than 1 template mask is provided"
 
     if template is None:
         template = input[0]
