@@ -5,7 +5,6 @@ from os import path
 
 import numpy as np
 
-from ..average import avg, avg_lts, avg_tran, demean1, demean2, demean3
 from ..utils import (
     call_niftyreg,
     is_function_available,
@@ -352,16 +351,10 @@ def f3d(
                 opts_str += f" --lncc {lncc}"
 
         if ssd is not None:
-            if type(ssd) is (int, float):
-                opts_str += f" -ssd {int(ssd)}"
-            else:
-                opts_str += " --ssd"
+            opts_str += f" -ssd {int(ssd)}" if type(ssd) is (int, float) else " --ssd"
 
         if kld is not None:
-            if type(kld) is (int, float):
-                opts_str += f" -kld {int(kld)}"
-            else:
-                opts_str += " --kld"
+            opts_str += f" -kld {int(ssd)}" if type(ssd) is (int, float) else " --kld"
 
         if amc is True:
             opts_str += " -amc"
@@ -469,7 +462,7 @@ def resample(
         if res is None:
             res = path.join(tmp_folder, "res.nii")
 
-        opts_str += " -res " + res
+        opts_str += f" -res {res}"
 
         if blank is not None:
             write_nifti(path.join(tmp_folder, "blank"), blank)
@@ -492,10 +485,7 @@ def resample(
 
         cmd_str += opts_str
 
-        if call_niftyreg(cmd_str, verbose):
-            return read_nifti(res)
-        else:
-            return None
+        return read_nifti(res) if call_niftyreg(cmd_str, verbose) else None
 
 
 def jacobian(trans, ref, jac=None, jacM=None, jacL=None):
@@ -533,45 +523,30 @@ def tools(
         if out is None:
             out = path.join(tmp_folder, "out.nii")
 
-        cmd_str += " -out " + out
+        cmd_str += f" -out {out}"
 
         if float is not None:
             cmd_str += " -float"
-            if call_niftyreg(cmd_str, verbose):
-                return read_nifti(out)
-            else:
-                return None
+            return read_nifti(out) if call_niftyreg(cmd_str, verbose) else None
 
         if down is not None:
             cmd_str += " -down"
-            if call_niftyreg(cmd_str, verbose):
-                return read_nifti(out)
-            else:
-                return None
+            return read_nifti(out) if call_niftyreg(cmd_str, verbose) else None
 
         if smoS is not None:
             smoS = ((smoS,) * 3) if np.isscalar(smoS) else smoS
             cmd_str += f' -smoS {" ".join(str(x) for x in smoS)}'
-            if call_niftyreg(cmd_str, verbose):
-                return read_nifti(out)
-            else:
-                return None
+            return read_nifti(out) if call_niftyreg(cmd_str, verbose) else None
 
         if smoG is not None:
             smoG = ((smoG,) * 3) if np.isscalar(smoG) else smoG
             cmd_str += f' -smoG {" ".join(str(x) for x in smoG)}'
-            if call_niftyreg(cmd_str, verbose):
-                return read_nifti(out)
-            else:
-                return None
+            return read_nifti(out) if call_niftyreg(cmd_str, verbose) else None
 
         if smoL is not None:
             smoL = ((smoL,) * 3) if np.isscalar(smoL) else smoL
             cmd_str += f' -smoL {" ".join(str(x) for x in smoL)}'
-            if call_niftyreg(cmd_str, verbose):
-                return read_nifti(out)
-            else:
-                return None
+            return read_nifti(out) if call_niftyreg(cmd_str, verbose) else None
 
         if add is not None:
             if isinstance(add, np.ndarray):
@@ -579,10 +554,7 @@ def tools(
                 cmd_str += " -add " + path.join(tmp_folder, "add.nii")
             else:
                 cmd_str += f" -add {add}"
-            if call_niftyreg(cmd_str, verbose):
-                return read_nifti(out)
-            else:
-                return None
+            return read_nifti(out) if call_niftyreg(cmd_str, verbose) else None
 
         if sub is not None:
             if isinstance(sub, np.ndarray):
@@ -590,10 +562,7 @@ def tools(
                 cmd_str += " -sub " + path.join(tmp_folder, "sub.nii")
             else:
                 cmd_str += f" -sub {sub}"
-            if call_niftyreg(cmd_str, verbose):
-                return read_nifti(out)
-            else:
-                return None
+            return read_nifti(out) if call_niftyreg(cmd_str, verbose) else None
 
         if mul is not None:
             if isinstance(mul, np.ndarray):
@@ -601,10 +570,7 @@ def tools(
                 cmd_str += " -mul " + path.join(tmp_folder, "mul.nii")
             else:
                 cmd_str += f" -mul {mul}"
-            if call_niftyreg(cmd_str, verbose):
-                return read_nifti(out)
-            else:
-                return None
+            return read_nifti(out) if call_niftyreg(cmd_str, verbose) else None
 
         if div is not None:
             if isinstance(div, np.ndarray):
@@ -612,56 +578,39 @@ def tools(
                 cmd_str += " -div " + path.join(tmp_folder, "div.nii")
             else:
                 cmd_str += f" -div {div}"
-            if call_niftyreg(cmd_str, verbose):
-                return read_nifti(out)
-            else:
-                return None
+            return read_nifti(out) if call_niftyreg(cmd_str, verbose) else None
 
         if rms is not None:
             write_nifti(path.join(tmp_folder, "rms.nii"), rms)
             cmd_str += " -rms " + path.join(tmp_folder, "rms.nii")
             out = call_niftyreg(cmd_str, verbose=verbose, output_stdout=True)
-            return None if not out else builtins.float(out)
+            return builtins.float(out) if out else None
 
         if bin is not None:
             cmd_str += " -bin"
-            if call_niftyreg(cmd_str, verbose):
-                return read_nifti(out)
-            else:
-                return None
+            return read_nifti(out) if call_niftyreg(cmd_str, verbose) else None
 
         if thr is not None:
             cmd_str += f" -thr {thr}"
-            if call_niftyreg(cmd_str, verbose):
-                return read_nifti(out)
-            else:
-                return None
+            return read_nifti(out) if call_niftyreg(cmd_str, verbose) else None
 
         if nan is not None:
             write_nifti(path.join(tmp_folder, "nan.nii"), nan)
             cmd_str += " -nan " + path.join(tmp_folder, "nan.nii")
-            if call_niftyreg(cmd_str, verbose):
-                return read_nifti(out, output_nan=True)
-            else:
-                return None
+            return (
+                read_nifti(out, output_nan=True)
+                if call_niftyreg(cmd_str, verbose)
+                else None
+            )
 
         if iso is not None:
             cmd_str += " -iso"
-            if call_niftyreg(cmd_str, verbose):
-                return read_nifti(out)
-            else:
-                return None
+            return read_nifti(out) if call_niftyreg(cmd_str, verbose) else None
 
         if noscl is not None:
             cmd_str += " -noscl"
-            if call_niftyreg(cmd_str, verbose):
-                return read_nifti(out)
-            else:
-                return None
+            return read_nifti(out) if call_niftyreg(cmd_str, verbose) else None
 
         if version is not None:
             cmd_str += " --version"
-            if call_niftyreg(cmd_str, verbose):
-                return read_nifti(out)
-            else:
-                return None
+            return read_nifti(out) if call_niftyreg(cmd_str, verbose) else None

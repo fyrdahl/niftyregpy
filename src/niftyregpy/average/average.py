@@ -23,7 +23,7 @@ def avg(input, output=None, verbose=False):
 
     """
 
-    if all([a.shape == (4, 4) for a in input]):
+    if all(a.shape == (4, 4) for a in input):
         return _avg_txt(input, output, verbose)
     else:
         return _avg_nii(input, output, verbose)
@@ -43,10 +43,7 @@ def _avg_txt(input, output=None, verbose=False):
             write_txt(os.path.join(tmp_folder, f"avg_{i}.txt"), x)
             cmd_str += os.path.join(tmp_folder, f"avg_{i}.txt") + " "
 
-        if call_niftyreg(cmd_str, verbose):
-            return read_txt(output)
-        else:
-            return None
+        return read_txt(output) if call_niftyreg(cmd_str, verbose) else None
 
 
 def _avg_nii(input, output=None, verbose=False):
@@ -63,10 +60,7 @@ def _avg_nii(input, output=None, verbose=False):
             write_nifti(os.path.join(tmp_folder, f"avg_{i}.nii"), x)
             cmd_str += os.path.join(tmp_folder, f"avg_{i}.nii") + " "
 
-        if call_niftyreg(cmd_str, verbose):
-            return read_nifti(output)
-        else:
-            return None
+        return read_nifti(output) if call_niftyreg(cmd_str, verbose) else None
 
 
 def avg_lts(aff, output=None, verbose=False):
@@ -85,7 +79,7 @@ def avg_lts(aff, output=None, verbose=False):
 
     """
 
-    assert all([a.shape == (4, 4) for a in aff]), "Not affine matrices"
+    assert all(a.shape == (4, 4) for a in aff), "Not affine matrices"
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
@@ -99,10 +93,7 @@ def avg_lts(aff, output=None, verbose=False):
             write_txt(os.path.join(tmp_folder, f"avg_{i}.txt"), x)
             cmd_str += os.path.join(tmp_folder, f"avg_{i}.txt") + " "
 
-        if call_niftyreg(cmd_str, verbose):
-            return read_txt(output)
-        else:
-            return None
+        return read_txt(output) if call_niftyreg(cmd_str, verbose) else None
 
 
 def avg_tran(ref, tran, flo, output=None, verbose=False):
@@ -144,10 +135,7 @@ def avg_tran(ref, tran, flo, output=None, verbose=False):
             cmd_str += os.path.join(tmp_folder, f"avg_tran_{i}.nii") + " "
             cmd_str += os.path.join(tmp_folder, f"avg_flo_{i}.nii") + " "
 
-        if call_niftyreg(cmd_str, verbose):
-            return read_nifti(output)
-        else:
-            return None
+        return read_nifti(output) if call_niftyreg(cmd_str, verbose) else None
 
 
 def demean1(ref, aff, flo, output=None, verbose=False):
@@ -194,10 +182,7 @@ def demean1(ref, aff, flo, output=None, verbose=False):
             cmd_str += os.path.join(tmp_folder, f"avg_aff_{i}.txt") + " "
             cmd_str += os.path.join(tmp_folder, f"avg_flo_{i}.nii") + " "
 
-        if call_niftyreg(cmd_str, verbose):
-            return read_nifti(output)
-        else:
-            return None
+        return read_nifti(output) if call_niftyreg(cmd_str, verbose) else None
 
 
 def demean2(ref, tran, flo, output=None, verbose=False):
@@ -235,10 +220,7 @@ def demean2(ref, tran, flo, output=None, verbose=False):
             cmd_str += os.path.join(tmp_folder, f"avg_tran_{i}.nii") + " "
             cmd_str += os.path.join(tmp_folder, f"avg_flo_{i}.nii") + " "
 
-        if call_niftyreg(cmd_str, verbose):
-            return read_nifti(output)
-        else:
-            return None
+        return read_nifti(output) if call_niftyreg(cmd_str, verbose) else None
 
 
 def demean3(ref, aff, tran, flo, output=None, verbose=False):
@@ -279,10 +261,7 @@ def demean3(ref, aff, tran, flo, output=None, verbose=False):
             cmd_str += os.path.join(tmp_folder, f"avg_tran_{i}.nii") + " "
             cmd_str += os.path.join(tmp_folder, f"avg_flo_{i}.nii") + " "
 
-        if call_niftyreg(cmd_str, verbose):
-            return read_nifti(output)
-        else:
-            return None
+        return read_nifti(output) if call_niftyreg(cmd_str, verbose) else None
 
 
 def demean_noaff(ref, aff, tran, flo, output=None, verbose=False):
@@ -322,7 +301,4 @@ def demean_noaff(ref, aff, tran, flo, output=None, verbose=False):
             cmd_str += os.path.join(tmp_folder, f"avg_tran_{i}.nii") + " "
             cmd_str += os.path.join(tmp_folder, f"avg_flo_{i}.nii") + " "
 
-        if call_niftyreg(cmd_str, verbose):
-            return read_nifti(output)
-        else:
-            return None
+        return read_nifti(output) if call_niftyreg(cmd_str, verbose) else None

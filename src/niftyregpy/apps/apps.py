@@ -79,7 +79,6 @@ def groupwise(
     ), "More than one template mask is provided"
 
     with tmp.TemporaryDirectory() as tmp_folder:
-        # tmp_folder = tmp.mkdtemp()  # DEBUG
 
         write_nifti(path.join(tmp_folder, "template.nii"), template)
 
@@ -146,7 +145,7 @@ def groupwise(
                         for x in shlex.split(affine_args):
                             aladin_args += f" {shlex.quote(x)}"
 
-                    aladin_cmd = "reg_aladin" + aladin_args
+                    aladin_cmd = f"reg_aladin{aladin_args}"
 
                     assert call_niftyreg(aladin_cmd, verbose), "Aladin command failed!"
 
@@ -158,19 +157,14 @@ def groupwise(
                         tmp_folder, f"average_affine_it_{cur_it+1}.nii"
                     )
                     average_args += " -demean1 "
-                    average_args += average_image + " "
+                    average_args += f"{average_image} "
                     for i, _ in enumerate(input):
                         cur_affine_file = path.join(
                             tmp_folder,
                             f"aff_mat_input_{i}_it{cur_it+1}.txt",
                         )
                         cur_img = path.join(tmp_folder, f"input_{i}.nii")
-                        average_args += cur_affine_file + " " + cur_img + " "
-
-                    average_cmd = "reg_average " + average_args
-                    assert call_niftyreg(
-                        average_cmd, verbose
-                    ), "Average command failed!"
+                        average_args += f"{cur_affine_file} {cur_img} "
 
                 else:
                     # All the result images are directly averaged during the last step
@@ -183,12 +177,10 @@ def groupwise(
                             tmp_folder,
                             f"aff_res_input_{i}_it{cur_it+1}.nii",
                         )
-                        average_args += " " + cur_img
+                        average_args += f" {cur_img}"
 
-                    average_cmd = "reg_average " + average_args
-                    assert call_niftyreg(
-                        average_cmd, verbose
-                    ), "Average command failed!"
+                average_cmd = f"reg_average {average_args}"
+                assert call_niftyreg(average_cmd, verbose), "Average command failed!"
 
                 average_image = path.join(
                     tmp_folder, f"average_affine_it_{cur_it+1}.nii"
@@ -241,7 +233,7 @@ def groupwise(
                         for x in shlex.split(nrr_args):
                             f3d_args += f" {shlex.quote(x)}"
 
-                    f3d_cmd = "reg_f3d " + f3d_args
+                    f3d_cmd = f"reg_f3d {f3d_args}"
                     assert call_niftyreg(f3d_cmd, verbose), "f3d command failed!"
 
                 # The transformation are demeaned to create the average image
@@ -263,14 +255,8 @@ def groupwise(
                             f"nrr_cpp_input_{i}_it{cur_it+1}.nii",
                         )
                         cur_img = path.join(tmp_folder, f"input_{i}.nii")
-                        average_args += (
-                            " " + cur_affine_file + " " + cur_f3d_file + " " + cur_img
-                        )
+                        average_args += f" {cur_affine_file} {cur_f3d_file} {cur_img}"
 
-                    average_cmd = "reg_average " + average_args
-                    assert call_niftyreg(
-                        average_cmd, verbose
-                    ), "Average command failed!"
                 else:
                     # All the result images are directly averaged during the last step
                     average_args = path.join(
@@ -282,13 +268,10 @@ def groupwise(
                             tmp_folder,
                             f"nrr_res_input_{i}_it{cur_it+1}.nii",
                         )
-                        average_args += " " + cur_img
+                        average_args += f" {cur_img}"
 
-                    average_cmd = "reg_average " + average_args
-                    assert call_niftyreg(
-                        average_cmd, verbose
-                    ), "Average command failed!"
-
+                average_cmd = f"reg_average {average_args}"
+                assert call_niftyreg(average_cmd, verbose), "Average command failed!"
                 average_image = path.join(
                     tmp_folder,
                     f"average_nonrigid_it_{cur_it+1}.nii",

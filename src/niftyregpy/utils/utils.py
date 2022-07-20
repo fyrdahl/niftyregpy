@@ -15,11 +15,7 @@ def read_nifti(name: str, output_nan=False) -> np.array:
 
     try:
         array = np.ascontiguousarray(nib.load(name).dataobj)
-        if not output_nan:
-            return np.nan_to_num(array, nan=0.0)
-        else:
-            return array
-
+        return array if output_nan else np.nan_to_num(array, nan=0.0)
     except OSError:
         return None
 
@@ -39,8 +35,7 @@ def write_nifti(name, array, __affine=None) -> bool:
 def read_txt(name: str):
 
     try:
-        array = np.loadtxt(name)
-        return array
+        return np.loadtxt(name)
     except OSError:
         return None
 
@@ -98,7 +93,7 @@ def is_function_available(tool: str, name: str) -> bool:
         p = sp.Popen(shlex.split(cmd_str), stdout=sp.PIPE, stderr=sp.PIPE)
         stdout, stderr = p.communicate()
 
-        if stderr or "-" + name.lower() not in stdout.decode(encoding="utf-8").lower():
+        if stderr or f"-{name.lower()}" not in stdout.decode(encoding="utf-8").lower():
             raise FileNotFoundError
 
         return True
@@ -110,7 +105,8 @@ def is_function_available(tool: str, name: str) -> bool:
 def create_test_image(length=256, blobs=6, min_rad=3, max_rad=32, dtype=float):
 
     array = np.zeros((length, length))
-    for i in range(blobs):
+
+    for _ in range(blobs):
         r = random.uniform(a=min_rad, b=max_rad)
         c = (random.uniform(a=r, b=length - r), random.uniform(a=r, b=length - r))
         array += _create_circle(length, c=c, r=r, dtype=dtype)

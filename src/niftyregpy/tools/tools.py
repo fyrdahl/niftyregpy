@@ -100,7 +100,7 @@ def smoS(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
         if output is None:
             output = path.join(tmp_folder, "output.nii")
 
-        cmd_str += " -out " + output
+        cmd_str += f" -out {output}"
         cmd_str += f" -smoS {sx} {sy} {sz} "
 
         if call_niftyreg(cmd_str, verbose):
@@ -137,7 +137,7 @@ def smoG(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
         if output is None:
             output = path.join(tmp_folder, "output.nii")
 
-        cmd_str += " -out " + output
+        cmd_str += f" -out {output}"
         cmd_str += f" -smoG {sx} {sy} {sz} "
 
         if call_niftyreg(cmd_str, verbose):
@@ -174,7 +174,7 @@ def smoL(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
         if output is None:
             output = path.join(tmp_folder, "output.nii")
 
-        cmd_str += " -out " + output
+        cmd_str += f" -out {output}"
         cmd_str += f" -smoL {sx} {sy} {sz} "
 
         if call_niftyreg(cmd_str, verbose):
@@ -209,7 +209,7 @@ def add(input, x, output=None, verbose=False):
         if output is None:
             output = path.join(tmp_folder, "output.nii")
 
-        cmd_str += " -out " + output
+        cmd_str += f" -out {output}"
 
         if np.isscalar(x):
             cmd_str += f" -add {x}"
@@ -249,7 +249,7 @@ def sub(input, x, output=None, verbose=False):
         if output is None:
             output = path.join(tmp_folder, "output.nii")
 
-        cmd_str += " -out " + output
+        cmd_str += f" -out {output}"
 
         if np.isscalar(x):
             cmd_str += f" -sub {x}"
@@ -289,7 +289,7 @@ def mul(input, x, output=None, verbose=False):
         if output is None:
             output = path.join(tmp_folder, "output.nii")
 
-        cmd_str += " -out " + output
+        cmd_str += f" -out {output}"
 
         if np.isscalar(x):
             cmd_str += f" -mul {x}"
@@ -328,7 +328,7 @@ def div(input, x, output=None, verbose=False):
         if output is None:
             output = path.join(tmp_folder, "output.nii")
 
-        cmd_str += " -out " + output
+        cmd_str += f" -out {output}"
 
         if np.isscalar(x):
             cmd_str += f" -div {x}"
@@ -360,7 +360,7 @@ def rms(input, x, output=None, verbose=False):
         if output is None:
             output = path.join(tmp_folder, "output.nii")
 
-        cmd_str += " -out " + output
+        cmd_str += f" -out {output}"
         cmd_str += " -rms " + path.join(tmp_folder, "x.nii")
 
         out = call_niftyreg(cmd_str, verbose, output_stdout=True)
@@ -515,7 +515,7 @@ def chgres(input, output=None, sx=0.0, sy=0.0, sz=0.0, verbose=False):
         if output is None:
             output = path.join(tmp_folder, "output.nii")
 
-        cmd_str += " -out " + output
+        cmd_str += f" -out {output}"
         cmd_str += f" -chgres {sx} {sy} {sz}"
 
         if call_niftyreg(cmd_str, verbose):
@@ -543,7 +543,7 @@ def rmNanInf(input, output=None, x=0.0, verbose=False):
         if output is None:
             output = path.join(tmp_folder, "output.nii")
 
-        cmd_str += " -out " + output
+        cmd_str += f" -out {output}"
         cmd_str += f" -rmNanInf {x}"
 
         if call_niftyreg(cmd_str, verbose):
@@ -571,7 +571,7 @@ def testActiveBlocks(input, output=None, verbose=False):
         if output is None:
             output = path.join(tmp_folder, "output.nii")
 
-        cmd_str += " -out " + output
+        cmd_str += f" -out {output}"
         cmd_str += " -testActiveBlocks"
 
         if call_niftyreg(cmd_str, verbose):
