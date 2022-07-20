@@ -60,7 +60,9 @@ def groupwise(
 
     """
 
-    assert len(input) >= 2, "Less than 2 input images have been specified"
+    assert (
+        isinstance(input, tuple) and len(input) >= 2
+    ), "Less than 2 input images have been specified"
     assert input_mask is None or len(input) == len(
         input_mask
     ), "The number of images is different from the number of floating masks"
