@@ -74,10 +74,12 @@ def aladin(
         opts_str = ""
 
         if res is None:
-            opts_str += " -res " + path.join(tmp_folder, "res.nii")
-
+            res = path.join(tmp_folder, "res.nii")
         if aff is None:
-            opts_str += " -aff " + path.join(tmp_folder, "aff.txt")
+            aff = path.join(tmp_folder, "aff.txt")
+
+        opts_str += f" -res {res}"
+        opts_str += f" -aff {aff}"
 
         if noSym is True:
             opts_str += " -noSym"
@@ -154,29 +156,29 @@ def aladin(
         if omp is not None:
             opts_str += f" -omp {omp}"
 
-        if NN is not None and is_function_available("reg_aladin", "NN"):
+        if NN is not None:
             opts_str += " --NN"
 
-        if LIN is not None and is_function_available("reg_aladin", "LIN"):
+        if LIN is not None:
             opts_str += " --LIN"
 
         if user_opts is not None:
             for x in shlex.split(user_opts):
                 opts_str += f" {x}"
-        else:
-            user_opts = []
 
-        if not verbose and "-voff" not in user_opts:
+        if not verbose and "-voff" not in (user_opts or []):
             opts_str += " -voff"
 
         cmd_str += opts_str
 
-        if call_niftyreg(cmd_str, verbose):
-            return read_nifti(path.join(tmp_folder, "res.nii")), read_txt(
-                path.join(tmp_folder, "aff.txt")
+        return (
+            (
+                read_nifti(res),
+                read_txt(aff),
             )
-        else:
-            return None
+            if call_niftyreg(cmd_str, verbose)
+            else None
+        )
 
 
 def f3d(
@@ -351,10 +353,14 @@ def f3d(
                 opts_str += f" --lncc {lncc}"
 
         if ssd is not None:
-            opts_str += f" -ssd {int(ssd)}" if type(ssd) is (int, float) else " --ssd"
+            opts_str += (
+                f" -ssd {int(ssd)}" if isinstance(ssd, (int, float)) else " --ssd"
+            )
 
         if kld is not None:
-            opts_str += f" -kld {int(ssd)}" if type(ssd) is (int, float) else " --kld"
+            opts_str += (
+                f" -kld {int(ssd)}" if isinstance(ssd, (int, float)) else " --kld"
+            )
 
         if amc is True:
             opts_str += " -amc"
@@ -402,18 +408,20 @@ def f3d(
         if user_opts is not None:
             for x in shlex.split(user_opts):
                 opts_str += f" {x}"
-        else:
-            user_opts = []
 
-        if not verbose and "-voff" not in user_opts:
+        if not verbose and "-voff" not in (user_opts or []):
             opts_str += " -voff"
 
         cmd_str += opts_str
 
-        if call_niftyreg(cmd_str, verbose):
-            return read_nifti(res), read_nifti(cpp)
-        else:
-            return None
+        return (
+            (
+                read_nifti(res),
+                read_nifti(cpp),
+            )
+            if call_niftyreg(cmd_str, verbose)
+            else None
+        )
 
 
 def resample(
