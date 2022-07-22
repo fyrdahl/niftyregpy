@@ -33,6 +33,7 @@ class TestApps:
             template_mask=common.create_circle(self.matrix_size),
             affine_args="-maxit 5 -omp 1",
             nrr_args="-maxit 300 -omp 1",
+            normalize=True,
             verbose=False,
         )
         assert 1 - common.dice(ref, output[0]) < self.tol

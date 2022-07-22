@@ -1,5 +1,3 @@
-import os
-import re
 import shlex
 import tempfile as tmp
 from os import path
@@ -65,7 +63,7 @@ def groupwise(
         isinstance(input_imgs, (tuple, list, set)) and len(input_imgs) >= 2
     ), "Less than 2 input images have been specified"
 
-    # If only one input_mask is provided, duplicate it to number of inputs
+    # If only one input_mask is provided, duplicate it to number of input images
     if isinstance(input_mask, (np.ndarray)):
         input_mask = [input_mask for _ in input_imgs]
 
@@ -90,6 +88,7 @@ def groupwise(
         input_imgs = [
             (x - z) / (y - z) for x, y, z in zip(input_imgs, max_val, min_val)
         ]
+        template = (template - template.min()) / (template.max() - template.min())
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
