@@ -59,8 +59,9 @@ def call_niftyreg(cmd_str: str, verbose=False, output_stdout=False) -> bool:
         for line in stdout.decode(encoding="utf-8").split("\n"):
             print(line)
 
-    for line in stderr.decode(encoding="utf-8").split("\n"):
-        print(line)
+    if stderr:
+        for line in stderr.decode(encoding="utf-8").split("\n"):
+            print(line)
 
     if stderr or p.returncode == -signal.SIGSEGV:
         return False
