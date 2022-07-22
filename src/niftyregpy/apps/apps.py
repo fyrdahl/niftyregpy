@@ -61,22 +61,27 @@ def groupwise(
     """
 
     assert (
-        isinstance(input, tuple) and len(input) >= 2
+        isinstance(input, (tuple, list, set)) and len(input) >= 2
     ), "Less than 2 input images have been specified"
+
+    # If only one input_mask is provided, duplicate it to number of inputs
+    if isinstance(input_mask, (np.ndarray)):
+        input_mask = [input_mask for _ in input]
+
     assert input_mask is None or len(input) == len(
         input_mask
-    ), "The number of images is different from the number of floating masks"
+    ), "The number of input masks are > 1 but different from the number input images"
 
     assert template is None or not isinstance(
-        template, tuple
+        template, (tuple, list, set)
     ), "More than 1 template is provided"
+
+    assert template_mask is None or not isinstance(
+        template_mask, (tuple, list, set)
+    ), "More than 1 template mask is provided"
 
     if template is None:
         template = input[0]
-
-    assert (
-        template_mask is None or len(template_mask) > 1
-    ), "More than one template mask is provided"
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
