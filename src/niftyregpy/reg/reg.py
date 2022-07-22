@@ -164,7 +164,7 @@ def aladin(
 
         if user_opts is not None:
             for x in shlex.split(user_opts):
-                opts_str += f" {x}"
+                opts_str += f" {shlex.quote(x)}"
 
         if not verbose and "-voff" not in (user_opts or []):
             opts_str += " -voff"
@@ -407,7 +407,7 @@ def f3d(
 
         if user_opts is not None:
             for x in shlex.split(user_opts):
-                opts_str += f" {x}"
+                opts_str += f" {shlex.quote(x)}"
 
         if not verbose and "-voff" not in (user_opts or []):
             opts_str += " -voff"
