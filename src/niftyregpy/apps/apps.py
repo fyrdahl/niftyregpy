@@ -11,7 +11,7 @@ from ..utils import call_niftyreg, read_nifti, write_nifti
 
 
 def groupwise(
-    input,
+    input_imgs,
     template=None,
     input_mask=None,
     template_mask=None,
@@ -19,6 +19,7 @@ def groupwise(
     nrr_it=10,
     affine_args=None,
     nrr_args=None,
+    normalize=False,
     verbose=False,
     show_pbar=True,
 ) -> tuple:
@@ -33,11 +34,11 @@ def groupwise(
     Arguments can be passed to both reg_aladin and reg_f3d using the
     ``affine_args`` and ``nrr_args`` arguments.
 
-    If no template image is explicitly provided, the first image in ``input``
+    If no template image is explicitly provided, the first image in ``input_imgs``
     will be used to initialize the atlas.
 
     Args:
-        input (tuple): Tuple that contains the images to create the atlas.
+        input_imgs (tuple): Tuple that contains the images to create the atlas.
         template (array): Template image to use to initialize the atlas (optional).
         input_mask (tuple): Masks for the input images (optional).
         template_mask (array): Mask for the template image (optional).
@@ -46,7 +47,7 @@ def groupwise(
         affine_args (str): Arguments to use for the affine registration (optional).
         nrr_args (str): Arguments to use for the non-rigid registration (optional).
         verbose (bool): Verbose output (default = False).
-        show_pbar (bool): Show progress bar (default = True).
+        show_pbar (bool): Show progress bars (default = True).
 
     Returns:
         A tuple containing
@@ -61,14 +62,14 @@ def groupwise(
     """
 
     assert (
-        isinstance(input, (tuple, list, set)) and len(input) >= 2
+        isinstance(input_imgs, (tuple, list, set)) and len(input_imgs) >= 2
     ), "Less than 2 input images have been specified"
 
     # If only one input_mask is provided, duplicate it to number of inputs
     if isinstance(input_mask, (np.ndarray)):
-        input_mask = [input_mask for _ in input]
+        input_mask = [input_mask for _ in input_imgs]
 
-    assert input_mask is None or len(input) == len(
+    assert input_mask is None or len(input_imgs) == len(
         input_mask
     ), "The number of input masks are > 1 but different from the number input images"
 
@@ -81,13 +82,20 @@ def groupwise(
     ), "More than 1 template mask is provided"
 
     if template is None:
-        template = input[0]
+        template = input_imgs[0]
+
+    if normalize:
+        max_val = [x.max() for x in input_imgs]
+        min_val = [x.min() for x in input_imgs]
+        input_imgs = [
+            (x - z) / (y - z) for x, y, z in zip(input_imgs, max_val, min_val)
+        ]
 
     with tmp.TemporaryDirectory() as tmp_folder:
 
         write_nifti(path.join(tmp_folder, "template.nii"), template)
 
-        for i, img in enumerate(input):
+        for i, img in enumerate(input_imgs):
             write_nifti(path.join(tmp_folder, f"input_{i}.nii"), img)
 
         if input_mask is not None:
@@ -105,7 +113,7 @@ def groupwise(
         ) as pbar:
             for cur_it in range(aff_it):
 
-                for i, _ in enumerate(input):
+                for i, _ in enumerate(input_imgs):
 
                     aladin_args = ""
 
@@ -163,7 +171,7 @@ def groupwise(
                     )
                     average_args += " -demean1 "
                     average_args += f"{average_image} "
-                    for i, _ in enumerate(input):
+                    for i, _ in enumerate(input_imgs):
                         cur_affine_file = path.join(
                             tmp_folder,
                             f"aff_mat_input_{i}_it{cur_it+1}.txt",
@@ -177,7 +185,7 @@ def groupwise(
                         tmp_folder, f"average_affine_it_{cur_it+1}.nii"
                     )
                     average_args += " -avg"
-                    for i, _ in enumerate(input):
+                    for i, _ in enumerate(input_imgs):
                         cur_img = path.join(
                             tmp_folder,
                             f"aff_res_input_{i}_it{cur_it+1}.nii",
@@ -197,7 +205,7 @@ def groupwise(
         ) as pbar:
             for cur_it in range(nrr_it):
 
-                for i, _ in enumerate(input):
+                for i, _ in enumerate(input_imgs):
 
                     f3d_args = ""
 
@@ -250,7 +258,7 @@ def groupwise(
                     )
                     average_args += " -demean_noaff "
                     average_args += average_image
-                    for i, _ in enumerate(input):
+                    for i, _ in enumerate(input_imgs):
                         cur_affine_file = path.join(
                             tmp_folder,
                             f"aff_mat_input_{i}_it{aff_it}.txt",
@@ -268,7 +276,7 @@ def groupwise(
                         tmp_folder, f"average_nonrigid_it_{cur_it+1}.nii"
                     )
                     average_args += " -avg"
-                    for i, _ in enumerate(input):
+                    for i, _ in enumerate(input_imgs):
                         cur_img = path.join(
                             tmp_folder,
                             f"nrr_res_input_{i}_it{cur_it+1}.nii",
@@ -287,8 +295,11 @@ def groupwise(
         average = read_nifti(average_image)
 
         res = []
-        for i, _ in enumerate(input):
+        for i, _ in enumerate(input_imgs):
             cur_img = path.join(tmp_folder, f"nrr_res_input_{i}_it{cur_it+1}.nii")
             res.append(read_nifti(cur_img))
+
+        if normalize:
+            res = [x * (y - z) + z for x, y, z in zip(res, max_val, min_val)]
 
     return average, res
