@@ -24,3 +24,9 @@ Tutorial:
 .. image:: https://colab.research.google.com/assets/colab-badge.svg
         :target: https://colab.research.google.com/github/fyrdahl/niftyregpy/blob/master/tutorial/tutorial.ipynb
         :alt: Open in Google Colab
+
+Via ``pip``
+***********
+niftyregpy can be installed through ``pip``::
+
+        pip install git+https://github.com/fyrdahl/niftyregpy
