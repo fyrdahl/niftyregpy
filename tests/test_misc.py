@@ -1,3 +1,4 @@
+import pytest
 from niftyregpy import utils
 
 import test_common as common
@@ -9,8 +10,8 @@ class TestMisc:
         assert output is not None
 
     def test_help_string_failure(self):
-        output = utils.get_help_string("reg_failure")
-        assert output is None
+        with pytest.raises(FileNotFoundError):
+            utils.get_help_string("reg_failure")
 
     def test_is_function_available(self):
         output = utils.is_function_available("reg_tools", "iso")
