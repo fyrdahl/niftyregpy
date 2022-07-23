@@ -117,15 +117,12 @@ def groupwise(
                     aladin_args = ""
 
                     if cur_it > 0:
-                        # Check if a previous affine can be use for initialization
                         prev_affine_file = path.join(
                             tmp_folder,
                             f"aff_mat_input_{i}_it{cur_it}.txt",
                         )
-                        if path.isfile(prev_affine_file):
-                            aladin_args += f" -inaff {prev_affine_file}"
+                        aladin_args += f" -inaff {prev_affine_file}"
                     else:
-                        # Registration is forced to be rigid for the first iteration
                         aladin_args += " -rigOnly"
 
                     # Check if a mask has been specified for the reference image
