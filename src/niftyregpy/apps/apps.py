@@ -27,7 +27,7 @@ def groupwise(
     first ``aff_it`` number of affine registrations (reg_aladin) are performed,
     the first is a rigid registration. Second, ``nrr_it`` number of non-rigid
     registrations (reg_f3d) are performed. After each full iteration, the
-    transforms are averaged, and used to initiliaze the next iteration.
+    transforms are averaged, and used to initialize the next iteration.
 
     Arguments can be passed to both reg_aladin and reg_f3d using the
     ``affine_args`` and ``nrr_args`` arguments.
@@ -55,7 +55,7 @@ def groupwise(
 
 
     Given two numpy arrays ``input_0`` and ``input_1``, an example usage is:
-        >>> avg, res = niftyregpy.apps.groupwise((input_0, input_1)
+        >>> avg, res = niftyregpy.apps.groupwise((input_0, input_1))
 
     """
 

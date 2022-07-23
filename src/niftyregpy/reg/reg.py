@@ -5,14 +5,7 @@ from os import path
 
 import numpy as np
 
-from ..utils import (
-    call_niftyreg,
-    is_function_available,
-    read_nifti,
-    read_txt,
-    write_nifti,
-    write_txt,
-)
+from ..utils import call_niftyreg, read_nifti, read_txt, write_nifti, write_txt
 
 
 def aladin(
@@ -233,8 +226,8 @@ def f3d(
     is presented in Modat et al., "Fast Free-Form Deformation using graphics
     processing units", CMPB, 2010
 
-    Cubic B-Spline are used to deform a source image in order to optimise a
-    objective function based on the Normalised Mutual Information and a penalty
+    Cubic B-Spline are used to deform a source image in order to optimize a
+    objective function based on the Normalized Mutual Information and a penalty
     term. The penalty term could be either the bending energy or the squared
     Jacobian determinant log.
     """

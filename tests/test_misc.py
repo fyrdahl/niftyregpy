@@ -13,6 +13,10 @@ class TestMisc:
         with pytest.raises(FileNotFoundError):
             utils.get_help_string("reg_failure")
 
+    def test_help_string_failure_unsafe(self):
+        with pytest.raises(FileNotFoundError):
+            utils.get_help_string("cat /etc/passwd")
+
     def test_is_function_available(self):
         output = utils.is_function_available("reg_tools", "iso")
         assert output is True
