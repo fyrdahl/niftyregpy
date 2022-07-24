@@ -44,6 +44,7 @@ def groupwise(
         nrr_it (int): Number of non-rigid iterations to perform (default = 10).
         affine_args (str): Arguments to use for the affine registration (optional).
         nrr_args (str): Arguments to use for the non-rigid registration (optional).
+        normalize (bool): Normalize input images to the range [0, 1] (default = False)
         verbose (bool): Verbose output (default = False).
         show_pbar (bool): Show progress bars (default = True).
 
