@@ -44,7 +44,7 @@ def groupwise(
         nrr_it (int): Number of non-rigid iterations to perform (default = 10).
         affine_args (str): Arguments to use for the affine registration (optional).
         nrr_args (str): Arguments to use for the non-rigid registration (optional).
-        normalize (bool): Normalize input images to the range [0, 1] (default = False)
+        normalize (bool): Normalize input images to the range [0, 1] (default = False).
         verbose (bool): Verbose output (default = False).
         show_pbar (bool): Show progress bars (default = True).
 
@@ -65,7 +65,7 @@ def groupwise(
     ), "Less than 2 input images have been specified"
 
     # If only one input_mask is provided, duplicate it to number of input images
-    if isinstance(input_mask, (np.ndarray)):
+    if isinstance(input_mask, np.ndarray):
         input_mask = [input_mask for _ in input_imgs]
 
     assert input_mask is None or len(input_imgs) == len(
@@ -73,11 +73,11 @@ def groupwise(
     ), "The number of input masks are > 1 but different from the number input images"
 
     assert template is None or not isinstance(
-        template, (tuple, list, set)
+        template, (tuple, list)
     ), "More than 1 template is provided"
 
     assert template_mask is None or not isinstance(
-        template_mask, (tuple, list, set)
+        template_mask, (tuple, list)
     ), "More than 1 template mask is provided"
 
     if template is None:
@@ -155,7 +155,7 @@ def groupwise(
                         for x in shlex.split(affine_args):
                             aladin_args += f" {shlex.quote(x)}"
 
-                    aladin_cmd = f"reg_aladin{aladin_args}"
+                    aladin_cmd = f"reg_aladin {aladin_args}"
 
                     assert call_niftyreg(aladin_cmd, verbose), "Aladin command failed!"
 
@@ -204,13 +204,9 @@ def groupwise(
 
                 for i, _ in enumerate(input_imgs):
 
-                    f3d_args = ""
-
-                    f3d_args += f" -ref {average_image}"
-
+                    f3d_args = f" -ref {average_image}"
                     f3d_args += " -flo "
                     f3d_args += path.join(tmp_folder, f"input_{i}.nii")
-
                     f3d_args += " -cpp "
                     f3d_args += path.join(
                         tmp_folder,
