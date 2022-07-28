@@ -18,6 +18,7 @@ def groupwise(
     affine_args=None,
     nrr_args=None,
     normalize=False,
+    nan_out=False,
     verbose=False,
     show_pbar=True,
 ) -> tuple:
@@ -45,6 +46,7 @@ def groupwise(
         affine_args (str): Arguments to use for the affine registration (optional).
         nrr_args (str): Arguments to use for the non-rigid registration (optional).
         normalize (bool): Normalize input images to the range [0, 1] (default = False).
+        nan_out (bool): If True, output NaN values (default = False).
         verbose (bool): Verbose output (default = False).
         show_pbar (bool): Show progress bars (default = True).
 
@@ -285,12 +287,12 @@ def groupwise(
 
                 pbar.update()
 
-        average = read_nifti(average_image)
+        average = read_nifti(average_image, output_nan=nan_out)
 
         res = []
         for i, _ in enumerate(input_imgs):
             cur_img = path.join(tmp_folder, f"nrr_res_input_{i}_it{cur_it+1}.nii")
-            res.append(read_nifti(cur_img))
+            res.append(read_nifti(cur_img, output_nan=nan_out))
 
         if normalize:
             res = [x * (y - z) + z for x, y, z in zip(res, max_val, min_val)]
