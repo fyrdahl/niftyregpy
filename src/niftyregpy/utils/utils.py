@@ -20,16 +20,17 @@ def read_nifti(name: str, output_nan=False) -> np.array:
         return None
 
 
-def write_nifti(name, array, __affine=None) -> bool:
+def write_nifti(name, array, _affine=None) -> bool:
 
     try:
         nib.save(
-            nib.Nifti1Image(np.ascontiguousarray(array), affine=__affine),
+            nib.Nifti1Image(array, affine=_affine or np.eye(4)),
             name,
         )
         return True
     except Exception as e:
-        raise e
+        print(e)
+        return False
 
 
 def read_txt(name: str):
@@ -46,10 +47,14 @@ def write_txt(name: str, array) -> bool:
         np.savetxt(name, array)
         return True
     except Exception as e:
-        raise e
+        print(e)
+        return False
 
 
 def call_niftyreg(cmd_str: str, verbose=False, output_stdout=False) -> bool:
+
+    if not cmd_str.startswith("reg_"):
+        return False
 
     p = sp.Popen(shlex.split(cmd_str), stdout=sp.PIPE, stderr=sp.PIPE)
     stdout, stderr = p.communicate()
