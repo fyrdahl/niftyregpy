@@ -20,13 +20,12 @@ def read_nifti(name: str, output_nan=False) -> np.array:
         return None
 
 
-def write_nifti(name, array, _affine=None) -> bool:
+def write_nifti(name, array, _affine=np.eye(4)) -> bool:
 
     try:
-        nib.save(
-            nib.Nifti1Image(array, affine=_affine or np.eye(4)),
-            name,
-        )
+        img = nib.Nifti1Image(array, affine=_affine)
+        img.update_header()
+        nib.save(img, name)
         return True
     except Exception as e:
         print(e)
