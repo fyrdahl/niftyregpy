@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 from niftyregpy import tools
 
 import test_common as common

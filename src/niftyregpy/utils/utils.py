@@ -24,7 +24,6 @@ def write_nifti(name, array, _affine=np.eye(4)) -> bool:
 
     try:
         img = nib.Nifti1Image(array, affine=_affine)
-        img.update_header()
         nib.save(img, name)
         return True
     except Exception as e:

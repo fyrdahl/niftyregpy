@@ -36,6 +36,9 @@ def groupwise(
     If no template image is explicitly provided, the first image in ``input_imgs``
     will be used to initialize the atlas.
 
+    This implementation should correspond closely to ``groupwise_niftyreg_params.sh``
+    and ``groupwise_niftyreg_run.sh`` scripts from the NiftyReg GitHub.
+
     Args:
         input_imgs (tuple): Tuple that contains the images to create the atlas.
         template (array): Template image to use to initialize the atlas (optional).
@@ -54,7 +57,7 @@ def groupwise(
         A tuple containing
 
         - average (array): Average image
-        - reg (tuple): Registered input images as a tuple
+        - reg (list): Registered input images as a list
 
 
     Given two numpy arrays ``input_0`` and ``input_1``, an example usage is:
@@ -63,7 +66,7 @@ def groupwise(
     """
 
     assert (
-        isinstance(input_imgs, (tuple, list, set)) and len(input_imgs) >= 2
+        isinstance(input_imgs, (tuple, list)) and len(input_imgs) >= 2
     ), "Less than 2 input images have been specified"
 
     # If only one input_mask is provided, duplicate it to number of input images
@@ -183,7 +186,9 @@ def groupwise(
                     average_args = path.join(
                         tmp_folder, f"average_affine_it_{cur_it+1}.nii"
                     )
+
                     average_args += " -avg"
+
                     for i, _ in enumerate(input_imgs):
                         cur_img = path.join(
                             tmp_folder,

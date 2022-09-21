@@ -433,17 +433,13 @@ def thr(input, thr, output=None, verbose=False):
         cmd_str += " -out " + path.join(tmp_folder, "output.nii")
         cmd_str += f" -thr {thr}"
 
-        if call_niftyreg(cmd_str, verbose):
-            return read_nifti(output)
-
-        return None
+        return read_nifti(output) if call_niftyreg(cmd_str, verbose) else None
 
 
 def nan(input, mask, output=None, verbose=False):
 
     """
-    This image is used to mask the input image.
-    Voxels outside of the mask are set to NaN
+    Mask the input image. Voxels outside of the mask are set to NaN.
 
     Args:
         input (array): Input array.
@@ -463,7 +459,7 @@ def nan(input, mask, output=None, verbose=False):
             output = path.join(tmp_folder, "output.nii")
 
         cmd_str += " -out " + path.join(tmp_folder, "output.nii")
-        cmd_str += " -nan " + path.join(tmp_folder, "x.nii")
+        cmd_str += " -nan " + path.join(tmp_folder, "mask.nii")
 
         if call_niftyreg(cmd_str, verbose):
             return read_nifti(output, output_nan=True)
