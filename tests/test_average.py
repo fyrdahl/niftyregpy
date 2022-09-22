@@ -1,3 +1,4 @@
+import numpy as np
 from niftyregpy import average
 from scipy.linalg import expm, logm
 
@@ -14,10 +15,9 @@ class TestAverage:
         aff1 = common.random_affine()
         aff2 = common.random_affine()
         output = average.avg((aff1, aff2), verbose=True)
-        assert (
-            output is not None
-            and ((output - expm((logm(aff1) + logm(aff2)) / 2)) < self.tol).all()
-        )
+        input = [aff1, aff2]
+        output2 = expm(sum(logm(aff) for aff in input) / len(input))
+        assert np.allclose(output, output2)
 
     def test_avg_image(self):
         img1 = common.random_array((self.matrix_size, self.matrix_size))

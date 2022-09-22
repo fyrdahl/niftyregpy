@@ -11,7 +11,7 @@ def avg(input, output=None, verbose=False):
 
     If input are affine matrices, the result will correspond to
         >>> from scipy.linalg import logm, expm
-        >>> out = expm((logm(M1)+logm(M2)+...+logm(MN))/N)
+        >>> out = expm(sum(logm(aff) for aff in input) / len(input))
 
     Args:
         input (tuple): Input images or affines to be averaged.
