@@ -1,5 +1,6 @@
 from .utils import (
     call_niftyreg,
+    colorband,
     create_test_image,
     get_help_string,
     is_function_available,
