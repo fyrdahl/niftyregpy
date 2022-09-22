@@ -9,10 +9,6 @@ def avg(input, output=None, verbose=False):
     """
     If input are images, their intensities are averaged.
 
-    If input are affine matrices, the result will correspond to
-        >>> from scipy.linalg import logm, expm
-        >>> out = expm(sum(logm(aff) for aff in input) / len(input))
-
     Args:
         input (tuple): Input images or affines to be averaged.
         output (string): Specify output file (optional).
@@ -21,6 +17,9 @@ def avg(input, output=None, verbose=False):
     Returns:
         array: Averaged input array.
 
+    If input are affine matrices, the result will correspond to
+        >>> from scipy.linalg import logm, expm
+        >>> out = expm(sum(logm(aff) for aff in input) / len(input))
     """
 
     if all(a.shape == (4, 4) for a in input):

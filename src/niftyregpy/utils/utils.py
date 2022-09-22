@@ -69,10 +69,7 @@ def call_niftyreg(cmd_str: str, verbose=False, output_stdout=False) -> bool:
     if stderr or p.returncode == -signal.SIGSEGV:
         return False
 
-    if output_stdout:
-        return stdout.decode(encoding="utf-8")
-
-    return True
+    return stdout.decode(encoding="utf-8") if output_stdout else True
 
 
 def get_help_string(tool: str) -> str:
