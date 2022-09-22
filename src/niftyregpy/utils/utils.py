@@ -123,3 +123,8 @@ def _create_circle(length, c=None, r=None, dtype=float):
     circ = np.sqrt((X - c[0]) ** 2 + (Y - c[1]) ** 2) <= r
 
     return circ.astype(dtype)
+
+
+def colorband(A, B):
+    out = np.dstack((A, B, A))
+    return (out / out.max() * 255).astype(np.uint8)
