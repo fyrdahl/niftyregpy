@@ -13,8 +13,8 @@ def groupwise(
     template=None,
     input_mask=None,
     template_mask=None,
-    aff_it=5,
-    nrr_it=10,
+    aff_it_num=5,
+    nrr_it_num=10,
     affine_args=None,
     nrr_args=None,
     normalize=False,
@@ -25,8 +25,8 @@ def groupwise(
     """
     Groupwise image registration seeks to mitigate bias caused by a single
     template image frame. The groupwise image registration works in two parts,
-    first ``aff_it`` number of affine registrations (reg_aladin) are performed,
-    the first is a rigid registration. Second, ``nrr_it`` number of non-rigid
+    first ``aff_it_num`` number of affine registrations (reg_aladin) are performed,
+    the first is a rigid registration. Second, ``nrr_it_num`` number of non-rigid
     registrations (reg_f3d) are performed. After each full iteration, the
     transforms are averaged, and used to initialize the next iteration.
 
@@ -36,19 +36,21 @@ def groupwise(
     If no template image is explicitly provided, the first image in ``input_imgs``
     will be used to initialize the atlas.
 
-    This implementation should correspond closely to ``groupwise_niftyreg_params.sh``
-    and ``groupwise_niftyreg_run.sh`` scripts from the NiftyReg GitHub.
+    This implementation should correspond closely to ``groupwise_niftyreg_run.sh``
+    from the NiftyReg source code, with default parameters selected similar to
+    ``groupwise_niftyreg_params.sh``. Differences from the original script are lack of
+    support for ``qsub`` and no default values for ``affine_args`` and ``nrr_args``.
 
     Args:
         input_imgs (tuple): Tuple that contains the images to create the atlas.
         template (array): Template image to use to initialize the atlas (optional).
         input_mask (tuple): Masks for the input images (optional).
         template_mask (array): Mask for the template image (optional).
-        aff_it (int): Number of affine iterations to perform (default = 5).
-        nrr_it (int): Number of non-rigid iterations to perform (default = 10).
+        aff_it_num (int): Number of affine iterations to perform (default = 5).
+        nrr_it_num (int): Number of non-rigid iterations to perform (default = 10).
         affine_args (str): Arguments to use for the affine registration (optional).
         nrr_args (str): Arguments to use for the non-rigid registration (optional).
-        normalize (bool): Normalize input images to the range [0, 1] (default = False).
+        normalize (bool): Normalize input images [0, 1] (default = False).
         nan_out (bool): If True, output NaN values (default = False).
         verbose (bool): Verbose output (default = False).
         show_pbar (bool): Show progress bars (default = True).
@@ -114,9 +116,9 @@ def groupwise(
 
         # Run the rigid or affine registration
         with tqdm(
-            total=aff_it, desc="Affine registration", disable=not show_pbar
+            total=aff_it_num, desc="Affine registration", disable=not show_pbar
         ) as pbar:
-            for cur_it in range(aff_it):
+            for cur_it in range(aff_it_num):
 
                 for i, _ in enumerate(input_imgs):
 
@@ -150,7 +152,7 @@ def groupwise(
                     aladin_args += " -flo " + path.join(tmp_folder, f"input_{i}.nii")
                     aladin_args += f" -aff {cur_affine_file}"
 
-                    if cur_it == aff_it - 1:
+                    if cur_it == aff_it_num - 1:
                         aladin_args += " -res " + path.join(
                             tmp_folder,
                             f"aff_res_input_{i}_it{cur_it+1}.nii",
@@ -164,7 +166,7 @@ def groupwise(
 
                     assert call_niftyreg(aladin_cmd, verbose), "Aladin command failed!"
 
-                if cur_it < aff_it - 1:
+                if cur_it < aff_it_num - 1:
                     # The transformations are demeaned to create the average image
                     # Note that this is not done for the last iteration step
 
@@ -205,9 +207,9 @@ def groupwise(
                 pbar.update()
 
         with tqdm(
-            total=nrr_it, desc="Non-rigid registration", disable=not show_pbar
+            total=nrr_it_num, desc="Non-rigid registration", disable=not show_pbar
         ) as pbar:
-            for cur_it in range(nrr_it):
+            for cur_it in range(nrr_it_num):
 
                 for i, _ in enumerate(input_imgs):
 
@@ -220,7 +222,7 @@ def groupwise(
                         f"nrr_cpp_input_{i}_it{cur_it+1}.nii",
                     )
 
-                    if cur_it == nrr_it - 1:
+                    if cur_it == nrr_it_num - 1:
                         f3d_args += " -res " + path.join(
                             tmp_folder,
                             f"nrr_res_input_{i}_it{cur_it+1}.nii",
@@ -235,11 +237,11 @@ def groupwise(
                         f3d_args += " -fmask "
                         f3d_args += path.join(tmp_folder, f"input_mask_{i}.nii")
 
-                    if aff_it > 0:
+                    if aff_it_num > 0:
                         f3d_args += " -aff "
                         f3d_args += path.join(
                             tmp_folder,
-                            f"aff_mat_input_{i}_it{aff_it}.txt",
+                            f"aff_mat_input_{i}_it{aff_it_num}.txt",
                         )
 
                     if nrr_args is not None:
@@ -251,7 +253,7 @@ def groupwise(
 
                 # The transformation are demeaned to create the average image
                 # Note that this is not done for the last iteration step
-                if cur_it < nrr_it - 1:
+                if cur_it < nrr_it_num - 1:
                     average_args = path.join(
                         tmp_folder,
                         f"average_nonrigid_it_{cur_it+1}.nii",
@@ -261,7 +263,7 @@ def groupwise(
                     for i, _ in enumerate(input_imgs):
                         cur_affine_file = path.join(
                             tmp_folder,
-                            f"aff_mat_input_{i}_it{aff_it}.txt",
+                            f"aff_mat_input_{i}_it{aff_it_num}.txt",
                         )
                         cur_f3d_file = path.join(
                             tmp_folder,
